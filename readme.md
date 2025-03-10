@@ -2,6 +2,6 @@
 
 Julian MARQUES (Chef de projet)  
 Chris MATHEVET  
-Yohann VILCOQ
-Carel RIBALTCHENKO
+Yohann VILCOQ  
+Carel RIBALTCHENKO  
 
