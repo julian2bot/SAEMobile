@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Restaurant {
-    final String osmid
-    final String nom
-    final int nbEtoile
-    final String codeCommune
-    final String nomCommune
-    final List<String> cuisines
+    final String osmid;
+    final String nom;
+    final int nbEtoile;
+    final String codeCommune;
+    final String nomCommune;
+    final List<String> cuisines;
     final String telephone;
     final String site;
     final String imageVertical;
@@ -20,13 +20,13 @@ class Restaurant {
             required this.nbEtoile,
             required this.codeCommune,
             required this.nomCommune,
-            required this.cuisine,
+            required this.cuisines,
             this.telephone = "",
             this.site = "",
             this.imageVertical = "",
             this.imageHorizontal = "",
-            this.noteMoyen = "",
-            this.lesCommentaires = [] 
+            this.noteMoyen = 0,
+            this.lesCommentaires = const [],
         });
     
 
@@ -43,7 +43,7 @@ class Restaurant {
             nbEtoile:json["nbEtoile"],
             codeCommune:json["codeCommune"],
             nomCommune:json["nomCommune"],
-            cuisine:json["cuisine"],
+            cuisines:json["cuisine"],
             telephone:json["telephone"],
             site:json["site"],
             imageVertical:json["imageVertical"],
@@ -54,19 +54,19 @@ class Restaurant {
     }
 
 
-    static Restaurant.newRestaurant(
-        int osmid,
+    static Restaurant newRestaurant(
+        String osmid,
         String nom,
         int nbEtoile,
         String codeCommune,
         String nomCommune,
-        String cuisine, {
+        List<String> cuisines, {
         String telephone = "",
         String site = "",
         String imageVertical = "",
         String imageHorizontal = "",
-        double noteMoyen = 0.0,
-        List<dynamic> lesCommentaires = const [],
+        int noteMoyen = 0,
+        List<String> lesCommentaires = const [],
     }) {
         return Restaurant(
         osmid: osmid,
@@ -74,7 +74,7 @@ class Restaurant {
         nbEtoile: nbEtoile,
         codeCommune: codeCommune,
         nomCommune: nomCommune,
-        cuisine: cuisine,
+        cuisines: cuisines,
         telephone: telephone,
         site: site,
         imageVertical: imageVertical,

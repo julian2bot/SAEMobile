@@ -1,4 +1,46 @@
 import 'package:flutter/material.dart';
+// import 'modele/utilisateur.dart';
+
+// utilisateur creer, get, insert, et delete test / exemple
+// void main() async {
+//   // Créer un utilisateur
+//   User newUser = User(idUser: 1, userName: "JeanDupont");
+//
+//   User? storedUser = await User.getUser();
+//   if (storedUser != null) {
+//     print("Utilisateur récupéré : ID=${storedUser.idUser}, Username=${storedUser.userName}");
+//   } else {
+//     print("Aucun utilisateur trouvé.");
+//   }
+//
+//   // Sauvegarder l'utilisateur
+//   await User.saveUser(newUser);
+//   print("Utilisateur sauvegardé !");
+//
+//   // Récupérer l'utilisateur stocké
+//   storedUser = await User.getUser();
+//   if (storedUser != null) {
+//     print("Utilisateur récupéré : ID=${storedUser.idUser}, Username=${storedUser.userName}");
+//   } else {
+//     print("Aucun utilisateur trouvé.");
+//   }
+//
+//   // Supprimer l'utilisateur
+//   await User.clearUser();
+//   print("Utilisateur supprimé !");
+//
+//   // Récupérer l'utilisateur stocké
+//   storedUser = await User.getUser();
+//   if (storedUser != null) {
+//     print("Utilisateur récupéré : ID=${storedUser.idUser}, Username=${storedUser.userName}");
+//   } else {
+//     print("Aucun utilisateur trouvé.");
+//   }
+// }
+
+
+
+
 
 void main() {
   runApp(const MyApp());
