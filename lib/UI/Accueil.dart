@@ -8,11 +8,37 @@ class Accueil extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(   // Correction ici
-        title: Text("IUTABLES'O"),
+      appBar: AppBar(
+        title: const Text("IUTABLES'O"),
+        actions: [
+          SearchAnchor(
+              builder: (context, controller) {
+                return IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: (){
+                    controller.openView();
+                  },
+                );
+              },
+              suggestionsBuilder: (context, controller){
+                String query = controller.text.toLowerCase();
+                List<String> filteredRestaurants = restaurants
+                  .where((r) => r.toLowerCase().contains(query))
+                  .toList();
+
+                return filteredRestaurants.map((r) {
+                  return ListTile(
+                    title: Text(r),
+                    onTap: () {
+                      controller.closeView(r);
+                  }
+                  );
+                });
+              },
+          )]
       ),
-      body: Center(
-        child: Text("Accueil"),  // Correction ici
+      body: const Center(
+        child: Text("Accueil"),
       ),
     );
   }
