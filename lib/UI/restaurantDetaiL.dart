@@ -5,39 +5,30 @@ import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
 import 'ajout_commentaire.dart';
 
+import "../API/api_bd.dart";
 
 class RestaurantDetailPage extends StatelessWidget {
     final String idrestaurant;
     final Restaurant restaurant;
 
+    const RestaurantDetailPage._internal(this.idrestaurant, this.restaurant);
 
-    
-    static Restaurant getRestoByID(String id){
-
-        // get de la bd a l'id = id
-        return  Restaurant.newRestaurant(
-            '12345',
-            'Freshkin',
-            3,
-            '45000',
-            'Orléans',
-            ['Française', 'Végétarienne'],
-            telephone: '02 38 79 05 40',
-            site: 'https://www.freshkin.fr',
-            imageHorizontal: 'https://saerestaurant.marquesjulian.fr/assets/img/Boeuf.png',
-            noteMoyen: 4,
-            lesCommentaires: [
-            new Commentaire(resto: "Freshkin", username: "CHris", nbEtoile: 2, dateCommentaire: "2022-2-9", commentaire: 'Très bon restaurant, je recommande !'),
-            new Commentaire(resto: "Freshkin", username: "Julian", nbEtoile: 3, dateCommentaire: "2022-2-9", commentaire: 'La nourriture était délicieuse'),
-            new Commentaire(resto: "Freshkin", username: "michel", nbEtoile: 4, dateCommentaire: "2022-2-9", commentaire: 'Service un peu lent.'),
-            new Commentaire(resto: "Freshkin", username: "jean", nbEtoile: 4, dateCommentaire: "2022-2-9", commentaire: 'Service un peu lent.'),
-            new Commentaire(resto: "Freshkin", username: "michmich", nbEtoile: 1, dateCommentaire: "2022-2-9", commentaire: 'Service un peu lent.'),
-            ],
-        );
+    static Future<RestaurantDetailPage> create(String idRestaurant) async {
+      print("Avant");
+      // Appel asynchrone pour obtenir les données du restaurant
+      final restaurant = await BdAPI.getRestaurantByID(idRestaurant);
+      await restaurant.getLesCommentaires();
+      // Retourne une instance de RestaurantDetailPage
+      print("Apres");
+      return RestaurantDetailPage._internal(idRestaurant, restaurant);
     }
-
-    RestaurantDetailPage({required this.idrestaurant})
-        : restaurant = RestaurantDetailPage.getRestoByID(idrestaurant);
+    
+    // static Future<Restaurant> getRestoByID(String id) async{
+    //   return BdAPI.getRestaurantByID(id);
+    // }
+    //
+    // RestaurantDetailPage({required this.idrestaurant}){}
+    //     : restaurant = await RestaurantDetailPage.getRestoByID(idrestaurant);
 
     void _launchURL(String url) async {
         Uri uri = Uri.parse(url);
@@ -61,9 +52,6 @@ class RestaurantDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(restaurant.nom);
-    print(restaurant.imageHorizontal);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(restaurant.nom),
