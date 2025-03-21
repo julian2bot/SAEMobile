@@ -1,5 +1,5 @@
 class Commentaire {
-  final String resto;
+  final String resto; // id restaurant
   final String username;
   final int nbEtoile;
   final String dateCommentaire;

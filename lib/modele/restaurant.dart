@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sae_mobile/modele/commentaire.dart';
 
 class Restaurant {
     final String osmid;
@@ -12,7 +13,7 @@ class Restaurant {
     final String imageVertical;
     final String imageHorizontal;
     final int noteMoyen;
-    final List<String> lesCommentaires;
+    final List<Commentaire> lesCommentaires;
 
 
     Restaurant({required this.osmid,
@@ -66,7 +67,7 @@ class Restaurant {
         String imageVertical = "",
         String imageHorizontal = "",
         int noteMoyen = 0,
-        List<String> lesCommentaires = const [],
+        List<Commentaire> lesCommentaires = const [],
     }) {
         return Restaurant(
         osmid: osmid,
