@@ -5,31 +5,7 @@ import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  Future<List<List<dynamic>>> loadCSV() async {
-    final String rawData = await rootBundle.loadString('assets/pass.csv');
-    List<List<dynamic>> csvTable = const CsvToListConverter().convert(rawData);
-
-    return csvTable;
-  }
-
-  List<List<dynamic>> passData = await loadCSV();
-
-  await Supabase.initialize(
-    url: passData[0][0],    // Accès correct aux éléments
-    anonKey: passData[1][0],
-  );
-
-  // final supabase = Supabase.instance.client;
-  // final data = await supabase
-  //     .from('utilisateur')
-  //     .select();
-  // for (var elem in data){
-  //   print(elem);
-  // }
-
+void main(){ 
   runApp(MyApp());
 }
 
