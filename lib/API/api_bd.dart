@@ -34,7 +34,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('REGION')
+        .from('region')
         .select('coderegion')
         .eq('coderegion', codeRegion)
         .maybeSingle();
@@ -46,7 +46,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('DEPARTEMENT')
+        .from('departement')
         .select('codedepartement')
         .eq('codedepartement', codeDepartement)
         .maybeSingle();
@@ -58,7 +58,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('COMMUNE')
+        .from('commune')
         .select('codecommune')
         .eq('codecommune', codeCommune)
         .maybeSingle();
@@ -70,7 +70,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select('osmid')
         .eq('osmid', osmid)
         .maybeSingle();
@@ -82,7 +82,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('CUISINE')
+        .from('cuisine')
         .select('idcuisine')
         .eq('nomcuisine', nomCuisine)
         .maybeSingle();
@@ -94,7 +94,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('AVIS')
+        .from('avis')
         .select('osmid')
         .eq('osmid', osmid)
         .eq('username', username)
@@ -107,7 +107,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('RESTAURANT_FAVORIS')
+        .from('restaurant_favoris')
         .select('osmid')
         .eq('osmid', osmid)
         .eq('username', username)
@@ -122,7 +122,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('REGION')
+        .from('region')
         .select()
         .eq('coderegion', codeRegion)
         .maybeSingle();
@@ -134,7 +134,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('DEPARTEMENT')
+        .from('departement')
         .select()
         .eq('codedepartement', codeDepartement)
         .maybeSingle();
@@ -146,7 +146,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('COMMUNE')
+        .from('commune')
         .select()
         .eq('codecommune', codeCommune)
         .maybeSingle();
@@ -157,7 +157,7 @@ class BdAPI {
   static Future<List<Restaurant>> getResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
-    final data = await supabase.from('RESTAURANT').select();
+    final data = await supabase.from('restaurant').select();
     final List<Restaurant> lesRestos = [];
 
     for (var resto in data) {
@@ -169,17 +169,21 @@ class BdAPI {
 
   // Récupère un restaurant par son ID
   static Future<Restaurant> getRestaurantByID(String osmID) async {
+    print("GET RESTAURANT");
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select()
         .eq('osmid', osmID)
         .maybeSingle();
     if (data != null) {
+      print("DATA RESTO : " + data.toString());
       final Map<String, dynamic> restaurantData = Map<String, dynamic>.from(data);
+      print("DATA RESTO 2 : " + restaurantData.toString());
       restaurantData['cuisines'] = await getCuisinePropose(osmID);
-      restaurantData['nomcommune'] = (await getCommune(restaurantData["codeommune"]))["nomcommune"];
+      restaurantData['nomcommune'] = (await getCommune(restaurantData["codecommune"]))["nomcommune"];
+      print("\n FINAL DATA" + restaurantData.toString());
       return Restaurant.fromJson(restaurantData);
     }
     return Restaurant.restaurantNull();
@@ -190,7 +194,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select()
         .ilike('nomrestaurant', '%$name%');
     final List<Restaurant> lesRestos = [];
@@ -206,7 +210,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('CUISINE')
+        .from('cuisine')
         .select('idcuisine')
         .order('idcuisine', ascending: false)
         .limit(1)
@@ -218,18 +222,31 @@ class BdAPI {
   static Future<List<String>> getCuisinePropose(String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
-    final data = await supabase
-        .from('PROPOSE')
-        .select('nomcuisine')
+    final proposeData = await supabase
+        .from('propose')
+        .select('idcuisine')
         .eq('osmid', osmID);
-    return data.map((e) => e['nomcuisine'] as String).toList();
+
+    List<String> cuisines = [];
+    for(var cuisine in proposeData){
+      final cuisineData = await supabase
+          .from('cuisine')
+          .select('nomcuisine')
+          .eq('idcuisine', cuisine["idcuisine"])
+          .maybeSingle();
+      if(cuisineData != null) {
+        cuisines.add(cuisineData["nomcuisine"]);
+      }
+    }
+
+    return cuisines;
   }
 
   // Récupère tous les types de restaurants
   static Future<List<String>> getAllTypeResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
-    final data = await supabase.from('RESTAURANT').select('DISTINCT(type)');
+    final data = await supabase.from('restaurant').select('DISTINCT(type)');
     return data.map((e) => e['type'] as String).toList();
   }
 
@@ -241,7 +258,7 @@ class BdAPI {
     final List<Restaurant> lesRestos = [];
 
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select()
         .or(types.map((type) => "type.ilike.%$type%").join(','));
 
@@ -255,7 +272,7 @@ class BdAPI {
   static Future<List<String>> getAllCuisinesResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
-    final data = await supabase.from('CUISINE').select('DISTINCT(nomcuisine)');
+    final data = await supabase.from('cuisine').select('DISTINCT(nomcuisine)');
     return data.map((e) => e['nomcuisine'] as String).toList();
   }
 
@@ -264,7 +281,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select('DISTINCT(marque)')
         .not('marque', 'is', null);
     return data.map((e) => e['marque'] as String).toList();
@@ -276,7 +293,7 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final List<Restaurant> lesRestos = [];
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select()
         .ilike('marque', '%$marque%');
     for (var resto in data) {
@@ -291,7 +308,7 @@ class BdAPI {
     if (cuisines.isEmpty) return [];
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('PROPOSE')
+        .from('propose')
         .select('osmid, count(osmid) as nb')
         .or(cuisines.map((cuisine) => "nomcuisine.ilike.%$cuisine%").join(','))
         // .groupBy('osmid')
@@ -311,7 +328,7 @@ class BdAPI {
     final conditions = services.map((service) => "$service.not.is.null").toList();
     List<Restaurant> restos = [];
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select()
         .or(conditions.join(','));
     for (var rest in data) {
@@ -325,7 +342,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('AVIS')
+        .from('avis')
         .select()
         .eq('osmid', osmID);
     if (data.isEmpty) {
@@ -350,7 +367,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('AVIS')
+        .from('avis')
         .select()
         .eq('osmid', osmID)
         .eq('username', username)
@@ -369,7 +386,7 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final List<Commentaire> lesComms = [];
     final data = await supabase
-        .from('AVIS')
+        .from('avis')
         .select('*')
         .eq('username', username);
     for(var comm in data){
@@ -384,7 +401,7 @@ class BdAPI {
     final avis = await getMesAvis(username);
     final supabase = Supabase.instance.client;
     final meilleursData = await supabase
-        .from('AVIS')
+        .from('avis')
         .select('*')
         .eq('username', username)
         .gte('note', 3);
@@ -468,7 +485,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .select('horizontal, vertical')
         .eq('osmid', osmid)
         .maybeSingle();
@@ -486,7 +503,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
-        .from('RESTAURANT_FAVORIS')
+        .from('restaurant_favoris')
         .select('*')
         .eq('username', username);
     final List<Restaurant> lesRestos = [];
@@ -506,7 +523,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('REGION')
+        .from('region')
         .insert({'coderegion': codeRegion, 'nomregion': nomRegion});
     return response.error == null;
   }
@@ -519,7 +536,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('DEPARTEMENT')
+        .from('departement')
         .insert({'coderegion': codeRegion, 'codedepartement': codeDepartement, 'nomdepartement': nomDepartement});
     return response.error == null;
   }
@@ -532,7 +549,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('COMMUNE')
+        .from('commune')
         .insert({'codedepartement': codeDepartement, 'codecommune': codeCommune, 'nomcommune': nomCommune});
     return response.error == null;
   }
@@ -545,7 +562,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .insert(info.asMap().map((index, value) => MapEntry('col$index', value)));
     return response.error == null;
   }
@@ -559,14 +576,14 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final nextIdResponse = await supabase
-        .from('CUISINE')
+        .from('cuisine')
         .select('idcuisine')
         .order('idcuisine', ascending: false)
         .limit(1)
         .maybeSingle();
     final nextId = (nextIdResponse != null ? nextIdResponse['idcuisine'] : 0) + 1;
     final response = await supabase
-        .from('CUISINE')
+        .from('cuisine')
         .insert({'idcuisine': nextId, 'nomcuisine': nomCuisine});
     if (response.error != null) {
       return -1;
@@ -579,7 +596,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final existingPropose = await supabase
-        .from('PROPOSE')
+        .from('propose')
         .select('idcuisine')
         .eq('osmid', osmID)
         .eq('nomcuisine', nomCuisine)
@@ -589,7 +606,7 @@ class BdAPI {
     }
     final idCuisine = await createCuisine(nomCuisine);
     final response = await supabase
-        .from('PROPOSE')
+        .from('propose')
         .insert({'idcuisine': idCuisine, 'osmid': osmID});
     return response.error == null;
   }
@@ -603,7 +620,7 @@ class BdAPI {
       for (var unJour in unHorraire["jours"]) {
         for (var unCrenau in unHorraire["heures"]) {
           final response = await supabase
-              .from('HEURE_OUVERTURE')
+              .from('heure_ouverture')
               .insert({'osmid': osmID, 'jouroçuverture': unJour, 'heuredebut': unCrenau["debut"], 'heurefin': unCrenau["fin"]});
           if (response.error != null) {
             print("erreur resto : $osmID format : $horaires");
@@ -621,7 +638,7 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final date = DateTime.now().toIso8601String();
     final response = await supabase
-        .from('AVIS')
+        .from('avis')
         .insert({'osmid': osmID, 'username': username, 'note': note, 'commentaire': commentaire, 'datecommentaire': date});
     if (response.error != null) {
       print("erreur ${response.error}");
@@ -637,14 +654,14 @@ class BdAPI {
     final isFavoris = await estFavoris(osmID, username);
     if (isFavoris) {
       final response = await supabase
-          .from('RESTAURANT_FAVORIS')
+          .from('restaurant_favoris')
           .delete()
           .eq('osmid', osmID)
           .eq('username', username);
       return response.error == null;
     } else {
       final response = await supabase
-          .from('RESTAURANT_FAVORIS')
+          .from('restaurant_favoris')
           .insert({'osmid': osmID, 'username': username});
       return response.error == null;
     }
@@ -660,7 +677,7 @@ class BdAPI {
       return false;
     }
     final response = await supabase
-        .from('AVIS')
+        .from('avis')
         .delete()
         .eq('osmid', osmID)
         .eq('username', username);
@@ -674,7 +691,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('RESTAURANT')
+        .from('restaurant')
         .update({'horizontal': imageH, 'vertical': imageV})
         .eq('osmid', osmid);
     return response.error == null;
@@ -688,7 +705,7 @@ class BdAPI {
       return false;
     }
     final response = await supabase
-        .from('AVIS')
+        .from('avis')
         .update({'commentaire': commentaire, 'note': etoiles})
         .eq('osmid', osmid)
         .eq('username', username);
@@ -702,7 +719,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .select('username')
         .eq('username', username)
         .maybeSingle();
@@ -714,7 +731,7 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .select('*')
         .eq('username', username)
         .maybeSingle();
@@ -745,7 +762,7 @@ class BdAPI {
     final hashedPassword = hashPassword(mdp);
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .insert({'username': username, 'mdp': hashedPassword, 'estadmin': isAdmin});
     return response.error == null;
   }
@@ -756,7 +773,7 @@ class BdAPI {
     final hashedPassword = hashPassword(mdp);
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .select('*')
         .eq('username', username)
         .eq('mdp', hashedPassword)
@@ -772,7 +789,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .delete()
         .eq('username', username);
     return response.error == null;
@@ -787,7 +804,7 @@ class BdAPI {
     final hashedPassword = hashPassword(mdp);
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .update({'username': newUsername, 'mdp': hashedPassword, 'estadmin': isAdmin})
         .eq('username', usernameBefore);
     return response.error == null;
@@ -801,7 +818,7 @@ class BdAPI {
     }
     final supabase = Supabase.instance.client;
     final response = await supabase
-        .from('UTILISATEUR')
+        .from('utilisateur')
         .update({'username': newUsername})
         .eq('username', usernameBefore);
     if (response.error == null) {

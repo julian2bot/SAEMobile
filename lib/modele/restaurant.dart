@@ -33,26 +33,21 @@ class Restaurant {
         });
 
     static Restaurant fromJson(Map<String, dynamic> json) {
-        // todo les commentaires + cuisine qui sont des listes
-        
-        
-        final cuisines = <String>[];
-        final commentaires = <String>[];
-        
+        print("\n FROM JSON \n");
         return Restaurant(
-            osmid:json["osmid"],
-            nom:json["nomrestaurant"],
-            nbEtoile:json["etoiles"],
-            codeCommune:json["codeommune"],
-            nomCommune:json["nomcommune"] ?? "undefined",
-            cuisines:json["cuisines"] ?? [],
-            telephone:json["telephone"],
-            site:json["siteinternet"],
-            imageVertical:json["vertical"],
-            imageHorizontal:json["horizontal"],
-            noteMoyen:json["noteMoyen"] ?? 0,
-            lesCommentaires:json["lesCommentaires"] ?? [],
-            type:json["type"] ?? ''
+          osmid: json["osmid"] ?? "",
+          nom: json["nomrestaurant"] ?? "",
+          nbEtoile: json["etoiles"] ?? 0,
+          codeCommune: json["codecommune"] ?? "",
+          nomCommune: json["nomcommune"] ?? "undefined",
+          cuisines: json["cuisines"] ?? [],
+          telephone: json["telephone"] ?? "undefined",
+          site: json["siteinternet"] ?? "undefined",
+          imageVertical: json["vertical"] ?? "undefined",
+          imageHorizontal: json["horizontal"] ?? "undefined",
+          noteMoyen: json["noteMoyen"] ?? 0,
+          lesCommentaires: json["lesCommentaires"] ?? [],
+          type: json["type"] ?? "",
         );
     }
 
