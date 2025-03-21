@@ -15,10 +15,10 @@ class Commentaire {
 
   static Commentaire fromJson(Map<String, dynamic> json) {
     return Commentaire(
-      resto: json["resto"] ?? "",
+      resto: json["osmid"] ?? "",
       username: json["username"] ?? "",
-      nbEtoile: json["nbEtoile"] ?? 0,
-      dateCommentaire: json["dateCommentaire"] ?? "",
+      nbEtoile: json["note"] ?? 0,
+      dateCommentaire: json["datecommentaire"] ?? "",
       commentaire: json["commentaire"] ?? "",
     );
   }
@@ -36,6 +36,16 @@ class Commentaire {
       nbEtoile: nbEtoile,
       dateCommentaire: dateCommentaire,
       commentaire: commentaire,
+    );
+  }
+
+  static Commentaire commentaireNull() {
+    return Commentaire.newCommentaire(
+      'undefined',
+      'undefined',
+      0,
+      'undefined',
+      'undefined'
     );
   }
 

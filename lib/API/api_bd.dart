@@ -3,17 +3,20 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:csv/csv.dart';
+import '../modele/restaurant.dart';
+import '../modele/commentaire.dart';
+import '../modele/utilisateur.dart' as utilisateur;
 
 class BdAPI {
-  bool bdIsInit = false;
+  static bool bdIsInit = false;
 
-  Future<List<List<dynamic>>> loadCSV() async {
+  static Future<List<List<dynamic>>> loadCSV() async {
     final String rawData = await rootBundle.loadString('assets/pass.csv');
     List<List<dynamic>> csvTable = const CsvToListConverter().convert(rawData);
     return csvTable;
   }
 
-  Future<void> initBD() async {
+  static Future<void> initBD() async {
     if (!bdIsInit) {
       List<List<dynamic>> passData = await loadCSV();
       await Supabase.initialize(
@@ -27,7 +30,7 @@ class BdAPI {
   // Vérificateurs
 
   // Vérifie si une région existe
-  Future<bool> regionExists(String codeRegion) async {
+  static Future<bool> regionExists(String codeRegion) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -39,7 +42,7 @@ class BdAPI {
   }
 
   // Vérifie si un département existe
-  Future<bool> departementExists(String codeDepartement) async {
+  static Future<bool> departementExists(String codeDepartement) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -51,7 +54,7 @@ class BdAPI {
   }
 
   // Vérifie si une commune existe
-  Future<bool> communeExists(String codeCommune) async {
+  static Future<bool> communeExists(String codeCommune) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -63,7 +66,7 @@ class BdAPI {
   }
 
   // Vérifie si un restaurant existe
-  Future<bool> restaurantExists(String osmid) async {
+  static Future<bool> restaurantExists(String osmid) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -75,7 +78,7 @@ class BdAPI {
   }
 
   // Vérifie si une cuisine existe
-  Future<int> getCuisineId(String nomCuisine) async {
+  static Future<int> getCuisineId(String nomCuisine) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -87,7 +90,7 @@ class BdAPI {
   }
 
   // Vérifie si un commentaire existe
-  Future<bool> commentaireExists(String osmid, String username) async {
+  static Future<bool> commentaireExists(String osmid, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -100,7 +103,7 @@ class BdAPI {
   }
 
   // Vérifie si un restaurant est dans les favoris
-  Future<bool> estFavoris(String osmid, String username) async {
+  static Future<bool> estFavoris(String osmid, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -113,79 +116,93 @@ class BdAPI {
   }
 
   // Getters
-
   
   // Récupère une région par son code
-  Future<List<Map<String, dynamic>>> getRegion(String codeRegion) async {
+  static Future<Map<String, dynamic>> getRegion(String codeRegion) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('REGION')
         .select()
-        .eq('coderegion', codeRegion);
-    return data;
+        .eq('coderegion', codeRegion)
+        .maybeSingle();
+    return Map<String, dynamic>.from(data!);
   }
 
   // Récupère un département par son code
-  Future<List<Map<String, dynamic>>> getDepartement(String codeDepartement) async {
+  static Future<Map<String, dynamic>> getDepartement(String codeDepartement) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('DEPARTEMENT')
         .select()
-        .eq('codedepartement', codeDepartement);
-    return data;
+        .eq('codedepartement', codeDepartement)
+        .maybeSingle();
+    return Map<String, dynamic>.from(data!);
   }
 
   // Récupère une commune par son code
-  Future<List<Map<String, dynamic>>> getCommune(String codeCommune) async {
+  static Future<Map<String, dynamic>> getCommune(String codeCommune) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('COMMUNE')
         .select()
-        .eq('codecommune', codeCommune);
-    return data;
+        .eq('codecommune', codeCommune)
+        .maybeSingle();
+    return Map<String, dynamic>.from(data!);
   }
 
   // Récupère tous les restaurants
-  Future<List<Map<String, dynamic>>> getResto() async {
+  static Future<List<Restaurant>> getResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase.from('RESTAURANT').select();
-    return data;
+    final List<Restaurant> lesRestos = [];
+
+    for (var resto in data) {
+      lesRestos.add(Restaurant.fromJson(resto));
+    }
+
+    return lesRestos;
   }
 
   // Récupère un restaurant par son ID
-  Future<List<Map<String, dynamic>>> getRestaurantByID(String osmID) async {
+  static Future<Restaurant> getRestaurantByID(String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('RESTAURANT')
         .select()
-        .eq('osmid', osmID);
-    if (data.isNotEmpty) {
-      data[0]['cuisines'] = await getCuisinePropose(osmID);
+        .eq('osmid', osmID)
+        .maybeSingle();
+    if (data != null) {
+      final Map<String, dynamic> restaurantData = Map<String, dynamic>.from(data);
+      restaurantData['cuisines'] = await getCuisinePropose(osmID);
+      restaurantData['nomcommune'] = (await getCommune(restaurantData["codeommune"]))["nomcommune"];
+      return Restaurant.fromJson(restaurantData);
     }
-    return data;
+    return Restaurant.restaurantNull();
   }
 
   // Récupère un restaurant par son nom
-  Future<List<Map<String, dynamic>>> getRestaurantByName(String name) async {
+  static Future<List<Restaurant>> getRestaurantByName(String name) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('RESTAURANT')
         .select()
         .ilike('nomrestaurant', '%$name%');
+    final List<Restaurant> lesRestos = [];
     for (var resto in data) {
       resto['cuisines'] = await getCuisinePropose(resto['osmid']);
+      lesRestos.add(Restaurant.fromJson(resto));
     }
-    return data;
+    return lesRestos;
   }
 
   // Récupère l'ID de la prochaine cuisine
-  Future<int> getNextCuisineID() async {
+  static Future<int> getNextCuisineID() async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -198,7 +215,7 @@ class BdAPI {
   }
 
   // Récupère les cuisines proposées pour un restaurant
-  Future<List<String>> getCuisinePropose(String osmID) async {
+  static Future<List<String>> getCuisinePropose(String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -209,7 +226,7 @@ class BdAPI {
   }
 
   // Récupère tous les types de restaurants
-  Future<List<String>> getAllTypeResto() async {
+  static Future<List<String>> getAllTypeResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase.from('RESTAURANT').select('DISTINCT(type)');
@@ -217,19 +234,25 @@ class BdAPI {
   }
 
   // Récupère les restaurants par type
-  Future<List<Map<String, dynamic>>> getRestoByType(List<String> types) async {
+  static Future<List<Restaurant>> getRestoByType(List<String> types) async {
     await initBD();
     if (types.isEmpty) return [];
     final supabase = Supabase.instance.client;
+    final List<Restaurant> lesRestos = [];
+
     final data = await supabase
         .from('RESTAURANT')
         .select()
         .or(types.map((type) => "type.ilike.%$type%").join(','));
-    return data;
+
+    for (var resto in data) {
+      lesRestos.add(Restaurant.fromJson(resto));
+    }
+    return lesRestos;
   }
 
   // Récupère toutes les cuisines des restaurants
-  Future<List<String>> getAllCuisinesResto() async {
+  static Future<List<String>> getAllCuisinesResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase.from('CUISINE').select('DISTINCT(nomcuisine)');
@@ -237,7 +260,7 @@ class BdAPI {
   }
 
   // Récupère toutes les marques des restaurants
-  Future<List<String>> getAllMarques() async {
+  static Future<List<String>> getAllMarques() async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -248,18 +271,22 @@ class BdAPI {
   }
 
   // Récupère les restaurants par marque
-  Future<List<Map<String, dynamic>>> getRestoByMarque(String marque) async {
+  static Future<List<Restaurant>> getRestoByMarque(String marque) async {
     await initBD();
     final supabase = Supabase.instance.client;
+    final List<Restaurant> lesRestos = [];
     final data = await supabase
         .from('RESTAURANT')
         .select()
         .ilike('marque', '%$marque%');
-    return data;
+    for (var resto in data) {
+      lesRestos.add(Restaurant.fromJson(resto));
+    }
+    return lesRestos;
   }
 
   // Récupère les restaurants par cuisine
-  Future<List<List<Map<String, dynamic>>>> getRestoByCuisine(List<String> cuisines) async {
+  static Future<List<Restaurant>> getRestoByCuisine(List<String> cuisines) async {
     await initBD();
     if (cuisines.isEmpty) return [];
     final supabase = Supabase.instance.client;
@@ -269,7 +296,7 @@ class BdAPI {
         .or(cuisines.map((cuisine) => "nomcuisine.ilike.%$cuisine%").join(','))
         // .groupBy('osmid')
         .order('nb', ascending: false);
-    List<List<Map<String, dynamic>>> restos = [];
+    List<Restaurant> restos = [];
     for (var rest in data) {
       restos.add(await getRestaurantByID(rest['osmid']));
     }
@@ -277,20 +304,24 @@ class BdAPI {
   }
 
   // Récupère les restaurants par services
-  Future<List<Map<String, dynamic>>> getRestoByServices(List<String> services) async {
+  static Future<List<Restaurant>> getRestoByServices(List<String> services) async {
     await initBD();
     if (services.isEmpty) return [];
     final supabase = Supabase.instance.client;
     final conditions = services.map((service) => "$service.not.is.null").toList();
+    List<Restaurant> restos = [];
     final data = await supabase
         .from('RESTAURANT')
         .select()
         .or(conditions.join(','));
-    return data;
+    for (var rest in data) {
+      restos.add(Restaurant.fromJson(rest));
+    }
+    return restos;
   }
 
   // Récupère les commentaires d'un restaurant
-  Future<Map<String, dynamic>> getCommentairesResto(String osmID) async {
+  static Future<Map<String, dynamic>> getCommentairesResto(String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -302,18 +333,20 @@ class BdAPI {
     }
     double noteTotal = 0;
     int count = 0;
+    List<Commentaire> lesComms = [];
     for (var avis in data) {
       if (avis['note'] != null) {
         noteTotal += avis['note'];
         count++;
       }
+      lesComms.add(Commentaire.fromJson(avis));
     }
     double noteMoyenne = count > 0 ? noteTotal / count : 0;
-    return {"noteMoy": noteMoyenne, "commentaires": data};
+    return {"noteMoy": noteMoyenne, "commentaires": lesComms};
   }
 
   // Récupère les commentaires d'un utilisateur pour un restaurant
-  Future<Map<String, dynamic>?> getCommentairesRestoUser(String osmID, String username) async {
+  static Future<Commentaire> getCommentairesRestoUser(String osmID, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -322,22 +355,31 @@ class BdAPI {
         .eq('osmid', osmID)
         .eq('username', username)
         .maybeSingle();
-    return data;
+    if(data == null){
+      return Commentaire.commentaireNull();
+    }
+    else{
+      return Commentaire.fromJson(data);
+    }
   }
 
   // Récupère les avis d'un utilisateur
-  Future<List<Map<String, dynamic>>> getMesAvis(String username) async {
+  static Future<List<Commentaire>> getMesAvis(String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
+    final List<Commentaire> lesComms = [];
     final data = await supabase
         .from('AVIS')
         .select('*')
         .eq('username', username);
-    return data;
+    for(var comm in data){
+      lesComms.add(Commentaire.fromJson(comm));
+    }
+    return lesComms;
   }
 
   // Récupère les recommandations pour un utilisateur
-  Future<List<Map<String, dynamic>>> getMesRecommandations(String username, {int max = 10}) async {
+  static Future<List<Restaurant>> getMesRecommandations(String username, {int max = 10}) async {
     final favoris = await getLesFavoris(username);
     final avis = await getMesAvis(username);
     final supabase = Supabase.instance.client;
@@ -353,8 +395,8 @@ class BdAPI {
     Map<String, int> lesCuisines = {};
     Map<String, int> lesTypes = {};
     for (var favResto in favoris) {
-      lesTypes[favResto['type']] = (lesTypes[favResto['type']] ?? 0) + 1;
-      final cuisines = await getCuisinePropose(favResto['osmid']);
+      lesTypes[favResto.type] = (lesTypes[favResto.type] ?? 0) + 1;
+      final cuisines = await getCuisinePropose(favResto.osmid);
       for (var cuisine in cuisines) {
         lesCuisines[cuisine] = (lesCuisines[cuisine] ?? 0) + 1;
       }
@@ -372,19 +414,19 @@ class BdAPI {
     final topTypes = sortedTypes.keys.take(2).toList();
     final lesCuisinesRestos = await getRestoByCuisine(topCuisines);
     final lesTypesRestos = await getRestoByType(topTypes);
-    List<Map<String, dynamic>> lesRecos = [];
+    List<Restaurant> lesRecos = [];
     int indexCuisines = 0;
     int indexTypes = 0;
     while (indexCuisines < max && indexCuisines < lesCuisinesRestos.length && lesRecos.length < max) {
       final resto = lesCuisinesRestos[indexCuisines];
-      if (!avis.contains(resto) && !favoris.contains(resto) && !lesRecos.contains(resto)) {
+      if (!favoris.contains(resto) && !lesRecos.contains(resto) && !avisContinentResto(avis, resto.osmid)) {
         lesRecos.add(resto);
       }
       indexCuisines++;
     }
     while (indexTypes < max && indexTypes < lesTypesRestos.length && lesRecos.length < max) {
       final resto = lesTypesRestos[indexTypes];
-      if (!avis.contains(resto) && !favoris.contains(resto) && !lesRecos.contains(resto)) {
+      if (!favoris.contains(resto) && !lesRecos.contains(resto) && !avisContinentResto(avis, resto.osmid)) {
         lesRecos.add(resto);
       }
       indexTypes++;
@@ -394,34 +436,35 @@ class BdAPI {
       int indexLambda = 0;
       while (indexLambda < max && indexLambda < lesRestosLambda.length && lesRecos.length < max) {
         final resto = lesRestosLambda[indexLambda];
-        if (!avis.contains(resto) && !favoris.contains(resto) && !lesRecos.contains(resto)) {
+        if (!favoris.contains(resto) && !lesRecos.contains(resto) && !avisContinentResto(avis, resto.osmid)) {
           lesRecos.add(resto);
         }
         indexLambda++;
       }
     }
     for (var reco in lesRecos) {
-      if (!reco.containsKey('cuisines')) {
-        reco['cuisines'] = await getCuisinePropose(reco['osmid']);
+      if (reco.cuisines == []) {
+        reco.cuisines = await getCuisinePropose(reco.osmid);
       }
     }
     return lesRecos;
   }
 
   // Recherche des restaurants par nom ou cuisine
-  Future<Map<String, dynamic>> rechercheResto(String value) async {
+  static Future<Map<String, dynamic>> rechercheResto(String value) async {
     final cuis = await getRestoByCuisine([value]);
     final resto = await getRestaurantByName(value);
+    final user = await utilisateur.User.getUser();
     final result = {
       'restos': [...cuis, ...resto],
-      'user': '', // Remplacez par le nom d'utilisateur si connecté
-      'favori': await getLesFavoris('') ?? [], // Remplacez par le nom d'utilisateur si connecté
+      'user': (user == null) ? "" : user.userName, // Remplacez par le nom d'utilisateur si connecté
+      'favori': (user == null) ? [] : await getLesFavoris(user.userName), // Remplacez par le nom d'utilisateur si connecté
     };
     return result;
   }
 
   // Récupère les images d'un restaurant
-  Future<Map<String, dynamic>> getImagesResto(String osmid) async {
+  static Future<Map<String, dynamic>> getImagesResto(String osmid) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -429,7 +472,7 @@ class BdAPI {
         .select('horizontal, vertical')
         .eq('osmid', osmid)
         .maybeSingle();
-    if (data == []) {
+    if (data == null) {
       return {
         'vertical': [],
         'horizontal': [],
@@ -439,20 +482,24 @@ class BdAPI {
   }
 
   // Récupère les favoris d'un utilisateur
-  Future<List<Map<String, dynamic>>> getLesFavoris(String username) async {
+  static Future<List<Restaurant>> getLesFavoris(String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('RESTAURANT_FAVORIS')
         .select('*')
         .eq('username', username);
-    return data;
+    final List<Restaurant> lesRestos = [];
+    for (var resto in data) {
+      lesRestos.add(await getRestaurantByID(resto["osmid"]));
+    }
+    return lesRestos;
   }
 
   // Insert
 
   // Créer une région si elle n'existe pas encore
-  Future<bool> createRegion(String codeRegion, String nomRegion) async {
+  static Future<bool> createRegion(String codeRegion, String nomRegion) async {
     await initBD();
     if (await regionExists(codeRegion)) {
       return false;
@@ -465,7 +512,7 @@ class BdAPI {
   }
 
   // Créer un département si il n'existe pas encore
-  Future<bool> createDepartement(String codeRegion, String codeDepartement, String nomDepartement) async {
+  static Future<bool> createDepartement(String codeRegion, String codeDepartement, String nomDepartement) async {
     await initBD();
     if (await departementExists(codeDepartement)) {
       return false;
@@ -478,7 +525,7 @@ class BdAPI {
   }
 
   // Créer une commune si elle n'existe pas encore
-  Future<bool> createCommune(String codeDepartement, String codeCommune, String nomCommune) async {
+  static Future<bool> createCommune(String codeDepartement, String codeCommune, String nomCommune) async {
     await initBD();
     if (await communeExists(codeCommune)) {
       return false;
@@ -491,7 +538,7 @@ class BdAPI {
   }
 
   // Crée un restaurant à partir d'une liste d'informations
-  Future<bool> createRestaurant(List<dynamic> info) async {
+  static Future<bool> createRestaurant(List<dynamic> info) async {
     await initBD();
     if (info.length != 24 || await restaurantExists(info[0])) {
       return false;
@@ -504,7 +551,7 @@ class BdAPI {
   }
 
   // Créer un type de cuisine s'il n'a pas été créé
-  Future<int> createCuisine(String nomCuisine) async {
+  static Future<int> createCuisine(String nomCuisine) async {
     await initBD();
     final idCuisine = await getCuisineId(nomCuisine);
     if (idCuisine != -1) {
@@ -528,7 +575,7 @@ class BdAPI {
   }
 
   // Insert une proposition de cuisine pour un restaurant (Crée la cuisine si elle n'existe pas)
-  Future<bool> insertCuisinePropose(String osmID, String nomCuisine) async {
+  static Future<bool> insertCuisinePropose(String osmID, String nomCuisine) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final existingPropose = await supabase
@@ -548,7 +595,7 @@ class BdAPI {
   }
 
   // Insert les horaires d'ouvertures d'un restaurant
-  Future<bool> insertHoraires(String osmID, String horaires) async {
+  static Future<bool> insertHoraires(String osmID, String horaires) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final transformedHours = transformOpeningHours(horaires);
@@ -569,7 +616,7 @@ class BdAPI {
   }
 
   // Ajoute un commentaire d'un utilisateur pour un restaurant
-  Future<bool> insertCommentaire(String osmID, String username, int note, String commentaire) async {
+  static Future<bool> insertCommentaire(String osmID, String username, int note, String commentaire) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final date = DateTime.now().toIso8601String();
@@ -584,7 +631,7 @@ class BdAPI {
   }
 
   // Ajoute ou retire un restaurant aux favoris de l'utilisateur
-  Future<bool> ajouteRetirerFavoris(String osmID, String username) async {
+  static Future<bool> ajouteRetirerFavoris(String osmID, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final isFavoris = await estFavoris(osmID, username);
@@ -606,7 +653,7 @@ class BdAPI {
   // Delete
 
   // Supprime un commentaire d'un utilisateur sur un restaurant
-  Future<bool> deleteCommentaireUser(String osmID, String username) async {
+  static Future<bool> deleteCommentaireUser(String osmID, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     if (!await commentaireExists(osmID, username)) {
@@ -623,7 +670,7 @@ class BdAPI {
   // Update
 
   // Ajoute des images à un restaurant par son ID
-  Future<bool> addImageRestaurantById(String osmid, String imageH, String imageV) async {
+  static Future<bool> addImageRestaurantById(String osmid, String imageH, String imageV) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -634,7 +681,7 @@ class BdAPI {
   }
 
   // Modifie un commentaire existant
-  Future<bool> updateCommentaire(String osmid, String username, String commentaire, int etoiles) async {
+  static Future<bool> updateCommentaire(String osmid, String username, String commentaire, int etoiles) async {
     await initBD();
     final supabase = Supabase.instance.client;
     if (!await commentaireExists(osmid, username)) {
@@ -651,7 +698,7 @@ class BdAPI {
   // User Management
 
   // Vérifie si un utilisateur existe
-  Future<bool> usernameExists(String username) async {
+  static Future<bool> usernameExists(String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -663,7 +710,7 @@ class BdAPI {
   }
 
   // Récupère les informations d'un utilisateur
-  Future<Map<String, dynamic>?> getUser(String username) async {
+  static Future<Map<String, dynamic>?> getUser(String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response = await supabase
@@ -675,30 +722,22 @@ class BdAPI {
   }
 
   // Connecte un utilisateur (met les infos dans une session)
-  Future<void> userConnecter(String username) async {
+  static Future<void> userConnecter(String username) async {
     await initBD();
     final userInfo = await getUser(username);
     if (userInfo != null) {
-      // Simuler une session avec une map
-      final session = {
-        "connecte": {
-          "username": userInfo['username'],
-          "admin": userInfo['estadmin'] ? "true" : "false",
-        }
-      };
-      // Vous pouvez stocker cette session dans un état global ou un gestionnaire de session
-      print(session);
+      utilisateur.User.saveUser(utilisateur.User(userName: userInfo['username'], isAdmin: userInfo['estadmin'] ?? false));
     }
   }
 
   // Vérifie si un utilisateur est administrateur
-  Future<bool> isAdmin(String username) async {
+  static Future<bool> isAdmin(String username) async {
     final userInfo = await getUser(username);
     return userInfo?['estadmin'] == true;
   }
 
   // Ajoute un utilisateur à la base de données
-  Future<bool> createUser(String username, String mdp, bool isAdmin) async {
+  static Future<bool> createUser(String username, String mdp, bool isAdmin) async {
     await initBD();
     if (await usernameExists(username)) {
       return false;
@@ -712,7 +751,7 @@ class BdAPI {
   }
 
   // Vérifie si la connexion est autorisée pour un username et un mdp
-  Future<bool> canLogin(String username, String mdp) async {
+  static Future<bool> canLogin(String username, String mdp) async {
     await initBD();
     final hashedPassword = hashPassword(mdp);
     final supabase = Supabase.instance.client;
@@ -726,7 +765,7 @@ class BdAPI {
   }
 
   // Supprime un utilisateur
-  Future<bool> deleteUser(String username) async {
+  static Future<bool> deleteUser(String username) async {
     await initBD();
     if (!await usernameExists(username)) {
       return false;
@@ -740,7 +779,7 @@ class BdAPI {
   }
 
   // Met à jour les informations d'un utilisateur
-  Future<bool> updateUser(String usernameBefore, String newUsername, String mdp, bool isAdmin) async {
+  static Future<bool> updateUser(String usernameBefore, String newUsername, String mdp, bool isAdmin) async {
     await initBD();
     if (usernameBefore != newUsername && await usernameExists(newUsername)) {
       return false;
@@ -755,7 +794,7 @@ class BdAPI {
   }
 
   // Met à jour le nom d'utilisateur
-  Future<bool> updateNameUser(String usernameBefore, String newUsername) async {
+  static Future<bool> updateNameUser(String usernameBefore, String newUsername) async {
     await initBD();
     if (usernameBefore != newUsername && await usernameExists(newUsername)) {
       return false;
@@ -772,12 +811,13 @@ class BdAPI {
     return false;
   }
 
-  // Fonction utilitaire pour hacher le mot de passe
-  String hashPassword(String password) {
+  // UTILITAIRE
+
+  static String hashPassword(String password) {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-  List<String> getAllDays(String firstDay, String lastDay) {
+  static List<String> getAllDays(String firstDay, String lastDay) {
     List<String> days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     List<String> res = [];
 
@@ -795,7 +835,7 @@ class BdAPI {
     return res;
   }
 
-  List<Map<String, dynamic>> transformOpeningHours(String opening) {
+  static List<Map<String, dynamic>> transformOpeningHours(String opening) {
     List<Map<String, dynamic>> res = [];
 
     List<String> lesHoraires = opening.split("; ");
@@ -848,6 +888,13 @@ class BdAPI {
     return res;
   }
 
-
+  static bool avisContinentResto(List<Commentaire> comms, String osmid){
+    for(var com in comms){
+      if(com.resto == osmid){
+        return false;
+      }
+    }
+    return true;
+  }
 
 }
