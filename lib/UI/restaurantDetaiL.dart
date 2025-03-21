@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
+import 'ajout_commentaire.dart';
+
 
 class RestaurantDetailPage extends StatelessWidget {
     final String idrestaurant;
@@ -193,10 +195,27 @@ class RestaurantDetailPage extends StatelessWidget {
             SizedBox(height: 16.0),
 
             // Commentaires
-            Text(
-              'Commentaires:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Commentaires:',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    print("creer un commentaire");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AddComment()),
+                    );
+
+                  },
+                ),
+              ],
             ),
+
             SizedBox(height: 8.0),
             for (var commentaire in restaurant.lesCommentaires)
               Card(
