@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 
 class AddComment extends StatefulWidget {
   const AddComment({super.key});
@@ -9,11 +13,29 @@ class AddComment extends StatefulWidget {
 
 class _AddCommentState extends State<AddComment> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  File? _selectedImage; 
 
   // Controllers pour récupérer le texte saisi
   final TextEditingController _commentController = TextEditingController();
 
   int _selectedRating = 0; // note default (0 à 5)
+
+
+
+  Future<void> _pickImage(ImageSource source) async {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source);
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path); // Convertit en fichier pour l'affichage
+        });
+      }
+    }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +83,40 @@ class _AddCommentState extends State<AddComment> {
               ),
               const SizedBox(height: 20),
 
-              // Bouton de validation
+
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.image),
+                    label: Text("Depuis la galerie"),
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                  ),
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.camera),
+                    label: Text("Prendre une photo"),
+                    onPressed: () => _pickImage(ImageSource.camera),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Affichage de l'image sélectionnée
+              if (_selectedImage != null)
+                Image.file(_selectedImage!, height: 150, width: double.infinity, fit: BoxFit.cover),
+
+              const SizedBox(height: 20),
+
+
+
+
+
+              // validation
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Récupération des valeurs saisies
+                      // recup les infos
                     String comment = _commentController.text;
                     int rating = _selectedRating;
 
@@ -73,10 +124,17 @@ class _AddCommentState extends State<AddComment> {
                     print("Commentaire : $comment");
                     print("Note : $rating");
 
-                    // Nettoyer les champs après validation
+                    if (_selectedImage != null) {
+                      print("Image sélectionnée : ${_selectedImage!.path}");
+                    }else{
+                      print("Image sélectionnée : nan");
+                    }
+
+
+                    // clear champs
                     _commentController.clear();
                     setState(() {
-                      _selectedRating = 0; // Réinitialiser la note
+                      _selectedRating = 0; 
                     });
                   }
                 },
