@@ -115,6 +115,19 @@ class BdAPI {
     return response != null;
   }
 
+  // Vérifie si une cuisine (id) est une préféré d'un user
+  static Future<bool> estCuisinePref(String username, int cuisineId) async{
+    await initBD();
+    final supabase = Supabase.instance.client;
+    final response = await supabase
+        .from('cuisine_favorites')
+        .select()
+        .eq('idcuisine', cuisineId)
+        .eq('username', username)
+        .maybeSingle();
+    return response != null;
+  }
+
   // Getters
   
   // Récupère une région par son code
@@ -223,6 +236,30 @@ class BdAPI {
         .from('propose')
         .select('idcuisine')
         .eq('osmid', osmID);
+
+    List<String> cuisines = [];
+    for(var cuisine in proposeData){
+      final cuisineData = await supabase
+          .from('cuisine')
+          .select('nomcuisine')
+          .eq('idcuisine', cuisine["idcuisine"])
+          .maybeSingle();
+      if(cuisineData != null) {
+        cuisines.add(cuisineData["nomcuisine"]);
+      }
+    }
+
+    return cuisines;
+  }
+
+  // Renvois les cuisines préféré d'un utilisateur
+  static Future<List<String>> getCuisinesPref(String username) async{
+    await initBD();
+    final supabase = Supabase.instance.client;
+    final proposeData = await supabase
+        .from('cuisine_favorites')
+        .select('idcuisine')
+        .eq('username', username);
 
     List<String> cuisines = [];
     for(var cuisine in proposeData){
@@ -662,6 +699,27 @@ class BdAPI {
       final response = await supabase
           .from('restaurant_favoris')
           .insert({'osmid': osmID, 'username': username});
+      return response.error == null;
+    }
+  }
+
+  // Ajoute ou retire une cuisine pref
+  static Future<bool> ajouteRetirerCuisinePref(String nomCuisine, String username) async {
+    await initBD();
+    final idCuisine = await getCuisineId(nomCuisine);
+    final supabase = Supabase.instance.client;
+    final isPref = await estCuisinePref(username,idCuisine);
+    if (isPref) {
+      final response = await supabase
+          .from('cuisine_favorites')
+          .delete()
+          .eq('idcuisine', idCuisine)
+          .eq('username', username);
+      return response.error == null;
+    } else {
+      final response = await supabase
+          .from('cuisine_favorites')
+          .insert({'idcuisine': idCuisine, 'username': username});
       return response.error == null;
     }
   }

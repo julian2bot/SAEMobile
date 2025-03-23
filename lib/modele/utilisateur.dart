@@ -61,4 +61,8 @@ class User {
   Future<Commentaire> getCommentaireResto(String osmId) async{
     return await BdAPI.getCommentairesRestoUser(osmId, this.userName);
   }
+
+  Future<List<String>> getMesCuisinesPref() async{
+    return await BdAPI.getCuisinesPref(this.userName);
+  }
 }
