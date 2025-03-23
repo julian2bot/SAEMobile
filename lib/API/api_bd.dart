@@ -169,7 +169,6 @@ class BdAPI {
 
   // Récupère un restaurant par son ID
   static Future<Restaurant> getRestaurantByID(String osmID) async {
-    print("GET RESTAURANT");
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -178,9 +177,7 @@ class BdAPI {
         .eq('osmid', osmID)
         .maybeSingle();
     if (data != null) {
-      print("DATA RESTO : " + data.toString());
       final Map<String, dynamic> restaurantData = Map<String, dynamic>.from(data);
-      print("DATA RESTO 2 : " + restaurantData.toString());
       restaurantData['cuisines'] = await getCuisinePropose(osmID);
       restaurantData['nomcommune'] = (await getCommune(restaurantData["codecommune"]))["nomcommune"];
       print("\n FINAL DATA" + restaurantData.toString());
@@ -397,6 +394,7 @@ class BdAPI {
 
   // Récupère les recommandations pour un utilisateur
   static Future<List<Restaurant>> getMesRecommandations(String username, {int max = 10}) async {
+    await initBD();
     final favoris = await getLesFavoris(username);
     final avis = await getMesAvis(username);
     final supabase = Supabase.instance.client;
@@ -469,6 +467,7 @@ class BdAPI {
 
   // Recherche des restaurants par nom ou cuisine
   static Future<Map<String, dynamic>> rechercheResto(String value) async {
+    await initBD();
     final cuis = await getRestoByCuisine([value]);
     final resto = await getRestaurantByName(value);
     final user = await utilisateur.User.getUser();
