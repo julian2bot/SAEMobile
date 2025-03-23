@@ -1,3 +1,5 @@
+import 'package:sae_mobile/API/api_bd.dart';
+
 class Commentaire {
   final String resto; // id restaurant
   final String username;
@@ -41,12 +43,13 @@ class Commentaire {
 
   static Commentaire commentaireNull() {
     return Commentaire.newCommentaire(
-      'undefined',
-      'undefined',
-      0,
-      'undefined',
-      'undefined'
-    );
+        'undefined', 'undefined', 0, 'undefined', 'undefined');
   }
 
+  Future<List<String>> getMesPhotos() async {
+    if (this.resto != 'undefined') {
+      return await BdAPI.getPhotosCommentaire(this.resto, this.username);
+    }
+    return [];
+  }
 }
