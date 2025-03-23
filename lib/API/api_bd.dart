@@ -354,6 +354,12 @@ class BdAPI {
     return restos;
   }
 
+  // Renvoie les restaurants par cuisines favorites d'un utilisateur
+  static Future<List<Restaurant>> getRestoByCuisineFav(String username) async {
+    List<String> cuisinesFav = await getCuisinesPref(username);
+    return await getRestoByCuisine(cuisinesFav);
+  }
+
   // Récupère les restaurants par services
   static Future<List<Restaurant>> getRestoByServices(
       List<String> services) async {
