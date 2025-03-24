@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../modele/restaurant.dart';
 import 'ListElem.dart';
+import 'restaurantDetaiL.dart';
 
 class Accueil extends StatelessWidget {
   final List<Restaurant> restaurants = [
@@ -16,7 +17,7 @@ class Accueil extends StatelessWidget {
       imageVertical: "https://example.com/image1_vertical.jpg",
       imageHorizontal: "https://example.com/image1_horizontal.jpg",
       noteMoyen: 4,
-      lesCommentaires: ["Excellente cuisine, service impeccable!", "Ambiance agréable, mais un peu cher."],
+      lesCommentaires: [],
     ),
     Restaurant.newRestaurant(
       "789012",
@@ -30,7 +31,7 @@ class Accueil extends StatelessWidget {
       imageVertical: "https://example.com/image2_vertical.jpg",
       imageHorizontal: "https://example.com/image2_horizontal.jpg",
       noteMoyen: 4,
-      lesCommentaires: ["Sushis frais et délicieux.", "Un peu trop de monde, réservation nécessaire."],
+      lesCommentaires: [],
     ),
   ];
 
@@ -62,7 +63,7 @@ class Accueil extends StatelessWidget {
                   title: Text(r.nom),
                   subtitle: Text(r.nomCommune),
                   onTap: () {
-                    restaurantDetail(r.osmid);
+                    //restaurantDetail(r.osmid);   TODO
                     controller.closeView(r.nom);
                   },
                 );
@@ -78,12 +79,12 @@ class Accueil extends StatelessWidget {
           final restaurant = restaurants[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => restaurantDetail(restaurant.osmid),
-                ),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => 
+              //   ),
+              // );
             },
             child: ListElem(
               image: restaurant.imageHorizontal,
