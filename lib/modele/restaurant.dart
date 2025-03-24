@@ -17,6 +17,9 @@ class Restaurant {
   List<Commentaire> lesCommentaires;
   final String type;
 
+  final double latitude;
+  final double longitude;
+
   Restaurant({
     required this.osmid,
     required this.nom,
@@ -31,6 +34,8 @@ class Restaurant {
     this.imageHorizontal = "",
     this.noteMoyen = 0,
     this.lesCommentaires = const [],
+    this.longitude =0,
+    this.latitude = 0,
   });
 
   static Restaurant fromJson(Map<String, dynamic> json) {
@@ -49,6 +54,8 @@ class Restaurant {
       noteMoyen: (json["noteMoyen"] as num?)?.toInt() ?? 0,
       lesCommentaires: json["lesCommentaires"] ?? [],
       type: json["type"] ?? "",
+      latitude: double.tryParse(json["latitude"]) ?? 0,
+      longitude: double.tryParse(json["longitude"]) ?? 0,
     );
   }
 
@@ -65,6 +72,8 @@ class Restaurant {
     String imageHorizontal = "",
     int noteMoyen = 0,
     List<Commentaire> lesCommentaires = const [],
+    double latitude = 0,
+    double longitude = 0,
   }) {
     return Restaurant(
       osmid: osmid,
@@ -79,6 +88,8 @@ class Restaurant {
       imageHorizontal: imageHorizontal,
       noteMoyen: noteMoyen,
       lesCommentaires: lesCommentaires,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
   //
