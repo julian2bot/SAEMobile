@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:sae_mobile/UI/mytheme.dart';
 import 'UI/restaurantDetaiL.dart';
 import 'router/router.dart';
 
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Flutter Demo',
       routerConfig: router,
+      theme: MyTheme.dark(),
     );
   }
 }

@@ -40,6 +40,10 @@ class User {
     return null; 
   }
 
+  static Future<bool> isAuthentificated() async{
+    return await getUser() != null;
+  }
+
   static Future<void> clearUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("userName");

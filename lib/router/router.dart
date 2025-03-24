@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:sae_mobile/main.dart';
 import '../UI/restaurantDetaiL.dart';
+import '../modele/utilisateur.dart';
 
 class Test extends StatelessWidget {
   @override
@@ -9,46 +10,108 @@ class Test extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-        onPressed: () => context.go('/detail/node_3422189698'),
-        child: const Text('Go back to Cha + (DEBUG)'),
+        onPressed: () {
+          User.saveUser(User(userName: "admin", isAdmin: true));
+          context.go(context.namedLocation('home'));
+        },
+        child: const Text('Go to Home'),
         ),
       )
     );
   }
 }
 
+class ScaffoldWithNavBar extends StatefulWidget {
+  final Widget child;
+  ScaffoldWithNavBar({required this.child,super.key,});
+
+  @override
+  State<ScaffoldWithNavBar> createState() =>
+      ScaffoldWithNavBarState();
+}
+
+class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: widget.child,
+        bottomNavigationBar:
+          BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Home'),
+              BottomNavigationBarItem(icon: Icon(Icons.favorite),label: 'Favorites'),
+              BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Settings'),
+              BottomNavigationBarItem(icon: Icon(Icons.logout),label: 'Disconnect')
+            ],
+            currentIndex: _selectedIndex,
+            onTap: (int idx) => _onItemTapped(idx, context),
+      )
+    );
+  }
+
+  void _onItemTapped(int index, BuildContext context) {
+    _selectedIndex = index;
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go(context.namedLocation('home'));
+      case 1:
+        GoRouter.of(context).go(context.namedLocation('favorites'));
+      case 2:
+        GoRouter.of(context).go(context.namedLocation('settings'));
+      case 3:
+        GoRouter.of(context).go(context.namedLocation('login'));
+    }
+  }
+
+}
+
 final router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/home',
+  redirect: (BuildContext context, GoRouterState state) async{
+    if (! await User.isAuthentificated()) {
+      return '/login';
+    } else {
+      return null;
+    }
+  },
   routes: [
-    GoRoute(
-      path: '/',
-      name: "home",
-      builder: (context, state) => Test(),
-    ),
-    GoRoute(
-      path: '/detail/:id',
-      name: "detail",
-      builder: (context, state) => RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
-    ),
+    ShellRoute(
+        builder: (context, state, child) {
+          return ScaffoldWithNavBar(child: child);
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: '/',
+            name: "home",
+            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/9136326362"),
+          ),
+          GoRoute(
+            path: '/detail/:id',
+            name: "detail",
+            builder: (context, state) => RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
+          ),
+          GoRoute(
+            path: '/favorites',
+            name: "favorites",
+            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/11627058270"),
+          ),
+          GoRoute(
+            path: '/settings',
+            name: "settings",
+            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
+          )
+        ]),
     GoRoute(
       path: '/login',
       name: "login",
-      builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
+      builder: (context, state) => Test(),
     ),
     GoRoute(
       path: '/signin',
       name: "signin",
-      builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
-    ),
-    GoRoute(
-      path: '/favorites',
-      name: "favorites",
-      builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
-    ),
-    GoRoute(
-      path: '/settings',
-      name: "settings",
-      builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
+      builder: (context, state) => Test(),
     )
   ],
 );
