@@ -10,7 +10,6 @@ class RestaurantDetailPage extends StatefulWidget {
   late String? idRestaurant;
 
   RestaurantDetailPage({Key? key, required this.idRestaurant}) : super(key: key) {
-    print("ID du restaurant: $idRestaurant");
     if(this.idRestaurant!=null)
       this.idRestaurant = this.idRestaurant!.replaceAll("_", "/");
     print("ID du restaurant: $idRestaurant");
@@ -35,7 +34,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     try {
       if(widget.idRestaurant != null){
         final resto = await BdAPI.getRestaurantByID(widget.idRestaurant!);
-        await resto.getLesCommentaires();
+        print("\nRESTO");
+        print(await resto.getLesCommentaires());
+
         setState(() {
           restaurant = resto;
           isLoading = false;
@@ -114,16 +115,16 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                Color starColor =
-                index < restaurant!.nbEtoile ? Colors.amber : Colors.grey;
-                return Icon(Icons.star, color: starColor);
-              }),
-            ),
-            SizedBox(height: 16.0),
-
+            if(restaurant!.nbEtoile != 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  Color starColor =
+                  index <restaurant!.nbEtoile ? Colors.amber : Colors.grey;
+                  return Icon(Icons.star, color: starColor);
+                }),
+              ),
+              SizedBox(height: 16.0),
             // Informations du restaurant
             Card(
               elevation: 4,

@@ -97,6 +97,7 @@ class Restaurant {
     if (this.osmid != '0' && this.lesCommentaires.isEmpty) {
       Map<String, dynamic> reponse =
           await BdAPI.getCommentairesResto(this.osmid);
+      print(reponse);
       this.lesCommentaires = reponse["commentaires"];
       this.noteMoyen = (reponse["noteMoy"] as num?)?.toInt() ?? 0;
     }

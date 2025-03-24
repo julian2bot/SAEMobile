@@ -1,6 +1,5 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:sae_mobile/main.dart';
 import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 
@@ -14,7 +13,7 @@ class Test extends StatelessWidget {
           User.saveUser(User(userName: "admin", isAdmin: true));
           context.go(context.namedLocation('home'));
         },
-        child: const Text('Go to Home'),
+        child: const Text("Login as 'admin'"),
         ),
       )
     );
@@ -61,14 +60,14 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
       case 2:
         GoRouter.of(context).go(context.namedLocation('settings'));
       case 3:
+        User.clearUser();
         GoRouter.of(context).go(context.namedLocation('login'));
     }
   }
-
 }
 
 final router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   redirect: (BuildContext context, GoRouterState state) async{
     if (! await User.isAuthentificated()) {
       return '/login';
@@ -100,7 +99,7 @@ final router = GoRouter(
           GoRoute(
             path: '/settings',
             name: "settings",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/3422189698"),
+            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/1494206007"),
           )
         ]),
     GoRoute(

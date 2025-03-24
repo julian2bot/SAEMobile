@@ -382,12 +382,12 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase.from('avis').select().eq('osmid', osmID);
+    List<Commentaire> lesComms = [];
     if (data.isEmpty) {
-      return {"noteMoy": 0, "commentaires": []};
+      return {"noteMoy": 0, "commentaires": lesComms};
     }
     double noteTotal = 0;
     int count = 0;
-    List<Commentaire> lesComms = [];
     for (var avis in data) {
       if (avis['note'] != null) {
         noteTotal += avis['note'];
