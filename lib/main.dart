@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sae_mobile/inscription.dart';
 
 import 'connection.dart';
-
+import 'inscription.dart';
 
 void main() {
   runApp(MyApp());
@@ -49,7 +50,10 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Action pour inscription
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SigninPage()),
+                );
               },
               child: Text('Inscription'),
             ),
