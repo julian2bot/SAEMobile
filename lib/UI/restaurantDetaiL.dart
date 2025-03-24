@@ -164,27 +164,29 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
 
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children:
-              List.generate(5, (index) {
-                // Détermine la couleur de l'étoile en fonction de l'index
-                Color starColor =
-                index < restaurant!.nbEtoile ? Colors.amber : Colors.grey;
-                return Icon(
-                  Icons.star,
-                  color: starColor,
-                );
-              }),
+            if(restaurant!.nbEtoile != 0)
 
-              // SizedBox(width: 4.0),
-              // Text(
-              //   '${restaurant.nbEtoile} étoiles',
-              //   style: TextStyle(fontSize: 18),
-              // ),
-              // ],
-            ),
-            SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:
+                List.generate(5, (index) {
+                  // Détermine la couleur de l'étoile en fonction de l'index
+                  Color starColor =
+                  index < restaurant!.nbEtoile ? Colors.amber : Colors.grey;
+                  return Icon(
+                    Icons.star,
+                    color: starColor,
+                  );
+                }),
+
+                // SizedBox(width: 4.0),
+                // Text(
+                //   '${restaurant.nbEtoile} étoiles',
+                //   style: TextStyle(fontSize: 18),
+                // ),
+                // ],
+              ),
+              SizedBox(height: 16.0),
 
             // Informations du restaurant dans une carte
             Card(
