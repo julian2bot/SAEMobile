@@ -40,6 +40,10 @@ class User {
     return null; 
   }
 
+  static Future<bool> isAuthentificated() async{
+    return await getUser() != null;
+  }
+
   static Future<void> clearUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("userName");
@@ -58,7 +62,7 @@ class User {
     return await BdAPI.getMesAvis(this.userName);
   }
 
-  Future<Commentaire> getCommentaireResto(String osmId) async{
+  Future<Commentaire?> getCommentaireResto(String osmId) async{
     return await BdAPI.getCommentairesRestoUser(osmId, this.userName);
   }
 

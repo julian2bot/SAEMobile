@@ -1,62 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
-
 import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
 import 'ajout_commentaire.dart';
+import 'package:go_router/go_router.dart';
 
-import "../API/api_bd.dart";
+import 'package:geolocator/geolocator.dart';
 import '../API/geolocator.dart';
 
+import "../API/api_bd.dart";
+class RestaurantDetailPage extends StatefulWidget {
+  late String? idRestaurant;
 
-
-class RestaurantDetailPage extends StatelessWidget {
-  final String idrestaurant;
-  final Restaurant restaurant;
-
-  const RestaurantDetailPage._internal(this.idrestaurant, this.restaurant);
-
-  static Future<RestaurantDetailPage> create(String idRestaurant) async {
-    print("Avant");
-    // Appel asynchrone pour obtenir les données du restaurant
-    final restaurant = await BdAPI.getRestaurantByID(idRestaurant);
-    await restaurant.getLesCommentaires();
-    // Retourne une instance de RestaurantDetailPage
-    print("Apres");
-    return RestaurantDetailPage._internal(idRestaurant, restaurant);
+  RestaurantDetailPage({Key? key, required this.idRestaurant}) : super(key: key) {
+    if(this.idRestaurant!=null)
+      this.idRestaurant = this.idRestaurant!.replaceAll("_", "/");
+    print("ID du restaurant: $idRestaurant");
   }
 
-  // static Future<Restaurant> getRestoByID(String id) async{
-  //   return BdAPI.getRestaurantByID(id);
-  // }
-  //
-  // RestaurantDetailPage({required this.idrestaurant}){}
-  //     : restaurant = await RestaurantDetailPage.getRestoByID(idrestaurant);
+  @override
+  _RestaurantDetailPageState createState() => _RestaurantDetailPageState();
+}
 
-  void _launchURL(String url) async {
-    Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Impossible d\'ouvrir l\'URL : $url';
+class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
+  Restaurant? restaurant;
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRestaurant();
+  }
+
+  Future<void> _loadRestaurant() async {
+    try {
+      if(widget.idRestaurant != null){
+        final resto = await BdAPI.getRestaurantByID(widget.idRestaurant!);
+        if (resto == null) {
+          context.go(context.namedLocation('404message', pathParameters: {'errorMessage' : "Restaurant introuvable"}));
+        }
+        await resto!.getLesCommentaires();
+
+        setState(() {
+          restaurant = resto;
+          isLoading = false;
+        });
+      }
+      else{
+        setState(() {
+          errorMessage = "Erreur: pas d'identifiant";
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Erreur: $e';
+        isLoading = false;
+      });
     }
   }
-
-  void _launchPhoneCall(String phoneNumber) async {
-    Uri uri = Uri.parse('tel:$phoneNumber');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Impossible d\'ouvrir le numéro : $phoneNumber';
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text("Chargement du restaurant")),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
+    if (errorMessage != null) {
+      return Scaffold(
+        appBar: AppBar(title: Text("Erreur")),
+        body: Center(child: Text(errorMessage!)),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -290,5 +310,23 @@ class RestaurantDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _launchURL(String url) async {
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Impossible d\'ouvrir l\'URL : $url';
+    }
+  }
+
+  void _launchPhoneCall(String phoneNumber) async {
+    Uri uri = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Impossible d\'ouvrir le numéro : $phoneNumber';
+    }
   }
 }
