@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+
 import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
 import 'ajout_commentaire.dart';
 
 import "../API/api_bd.dart";
+import '../API/geolocator.dart';
+
+
 
 class RestaurantDetailPage extends StatelessWidget {
   final String idrestaurant;
@@ -48,8 +53,11 @@ class RestaurantDetailPage extends StatelessWidget {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text(restaurant.nom),
@@ -86,17 +94,57 @@ class RestaurantDetailPage extends StatelessWidget {
               ),
             SizedBox(height: 16.0),
 
-            // Nom du restaurant et étoiles (header)
-            Center(
-              child: Text(
-                restaurant.nom,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
+            // titre / dist
+            Stack(
+              clipBehavior: Clip.none,
+
+              children: [
+                Center(
+                  child: Text(
+                    restaurant.nom,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                // dist
+                Positioned(
+                  right: 10,
+                  bottom: 60,
+                  child: FutureBuilder<double>(
+                    future: GeoPosition.distance(restaurant),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // chargement
+                      } else if (snapshot.hasError) {
+                        return Text("-- Km");
+                      } else if (snapshot.hasData) {
+                        double distance = snapshot.data!;
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Text(
+                            '${distance.toStringAsFixed(1)} km',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      } else {
+                        return Text("-- Km");
+                      }
+                    },
+                  ),
+                ),
+              ],
+            )
+            ,
+
+
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children:
-                  // [
                   List.generate(5, (index) {
                 // Détermine la couleur de l'étoile en fonction de l'index
                 Color starColor =
@@ -127,6 +175,7 @@ class RestaurantDetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
                     // adresse
                     Text(
                       'Adresse: ${restaurant.codeCommune}, ${restaurant.nomCommune}',
@@ -135,15 +184,16 @@ class RestaurantDetailPage extends StatelessWidget {
                     SizedBox(height: 8.0),
                     SizedBox(width: double.infinity),
 
-                    // Cuisines
-                    Text(
-                      'Cuisines: ${restaurant.cuisines.join(', ')}',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(height: 8.0),
+                    if (restaurant.cuisines.isNotEmpty)
+                      // Cuisines
+                      Text(
+                        'Cuisines: ${restaurant.cuisines.join(', ')}',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(height: 8.0),
 
                     // Téléphone
-                    if (restaurant.telephone.isNotEmpty)
+                    if (restaurant.telephone != "undefined")
                       ElevatedButton.icon(
                         onPressed: () => _launchPhoneCall(restaurant.telephone),
                         icon: Icon(Icons.phone),
@@ -155,7 +205,7 @@ class RestaurantDetailPage extends StatelessWidget {
                     SizedBox(width: double.infinity),
 
                     // Site web
-                    if (restaurant.site.isNotEmpty)
+                    if (restaurant.site != "undefined")
                       ElevatedButton.icon(
                         onPressed: () => _launchURL(restaurant.site),
                         icon: Icon(Icons.web),
