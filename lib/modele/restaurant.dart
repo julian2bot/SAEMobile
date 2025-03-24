@@ -46,7 +46,7 @@ class Restaurant {
       site: json["siteinternet"] ?? "undefined",
       imageVertical: json["vertical"] ?? "undefined",
       imageHorizontal: json["horizontal"] ?? "undefined",
-      noteMoyen: json["noteMoyen"] ?? 0,
+      noteMoyen: (json["noteMoyen"] as num?)?.toInt() ?? 0,
       lesCommentaires: json["lesCommentaires"] ?? [],
       type: json["type"] ?? "",
     );
@@ -98,7 +98,7 @@ class Restaurant {
       Map<String, dynamic> reponse =
           await BdAPI.getCommentairesResto(this.osmid);
       this.lesCommentaires = reponse["commentaires"];
-      this.noteMoyen = reponse["noteMoy"];
+      this.noteMoyen = (reponse["noteMoy"] as num?)?.toInt() ?? 0;
     }
     return this.lesCommentaires;
   }
