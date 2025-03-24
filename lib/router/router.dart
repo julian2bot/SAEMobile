@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
+import '../UI/404.dart';
 
 class Test extends StatelessWidget {
   @override
@@ -39,10 +40,10 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
         bottomNavigationBar:
           BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Home'),
-              BottomNavigationBarItem(icon: Icon(Icons.favorite),label: 'Favorites'),
-              BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Settings'),
-              BottomNavigationBarItem(icon: Icon(Icons.logout),label: 'Disconnect')
+              BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Accueil'),
+              BottomNavigationBarItem(icon: Icon(Icons.favorite),label: 'Favoris'),
+              BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Parametres'),
+              BottomNavigationBarItem(icon: Icon(Icons.logout),label: 'Deconnexion')
             ],
             currentIndex: _selectedIndex,
             onTap: (int idx) => _onItemTapped(idx, context),
@@ -68,6 +69,7 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
 
 final router = GoRouter(
   initialLocation: '/',
+  onException: (_, GoRouterState state, GoRouter router) {router.go('/404', extra: state.uri.toString()); },
   redirect: (BuildContext context, GoRouterState state) async{
     if (! await User.isAuthentificated()) {
       return '/login';
@@ -111,6 +113,16 @@ final router = GoRouter(
       path: '/signin',
       name: "signin",
       builder: (context, state) => Test(),
+    ),
+    GoRoute(
+      path: '/404/:errorMessage',
+      name: "404message",
+      builder: (context, state) => Page404(errorMessage:state.pathParameters['errorMessage']),
+    ),
+    GoRoute(
+      path: '/404',
+      name: "404",
+      builder: (context, state) => Page404(),
     )
   ],
 );

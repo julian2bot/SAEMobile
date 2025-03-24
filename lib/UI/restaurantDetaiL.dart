@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
 import 'ajout_commentaire.dart';
+import 'package:go_router/go_router.dart';
 
 import "../API/api_bd.dart";
 class RestaurantDetailPage extends StatefulWidget {
@@ -34,8 +35,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     try {
       if(widget.idRestaurant != null){
         final resto = await BdAPI.getRestaurantByID(widget.idRestaurant!);
-        print("\nRESTO");
-        print(await resto.getLesCommentaires());
+        if (resto == null) {
+          context.go(context.namedLocation('404message', pathParameters: {'errorMessage' : "Restaurant introuvable"}));
+        }
+        await resto!.getLesCommentaires();
 
         setState(() {
           restaurant = resto;
