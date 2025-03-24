@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../modele/restaurant.dart';
-import '../modele/commentaire.dart';
-import 'ajout_commentaire.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:geolocator/geolocator.dart';
-import '../API/geolocator.dart';
+import '../modele/commentaire.dart';
+import '../modele/restaurant.dart';
+
+import 'ajout_commentaire.dart';
 
 import "../API/api_bd.dart";
+import '../API/geolocator.dart';
+
 class RestaurantDetailPage extends StatefulWidget {
   late String? idRestaurant;
 
@@ -80,7 +82,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(restaurant.nom),
+        title: Text(restaurant!.nom),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -88,7 +90,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image du restaurant
-            if (restaurant.imageHorizontal.isNotEmpty)
+            if (restaurant!.imageHorizontal.isNotEmpty)
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -97,7 +99,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30.0),
                   child: CachedNetworkImage(
-                    imageUrl: restaurant.imageHorizontal,
+                    imageUrl: restaurant!.imageHorizontal,
                     placeholder: (context, url) =>
                         Center(child: CircularProgressIndicator()),
                     errorWidget: (context, url, error) => Image.asset(
@@ -121,7 +123,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               children: [
                 Center(
                   child: Text(
-                    restaurant.nom,
+                    restaurant!.nom,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -131,7 +133,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   right: 10,
                   bottom: 60,
                   child: FutureBuilder<double>(
-                    future: GeoPosition.distance(restaurant),
+                    future: GeoPosition.distance(restaurant!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return CircularProgressIndicator(); // chargement
@@ -142,7 +144,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         return Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: Colors.black45,
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: Text(
@@ -165,10 +167,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children:
-                  List.generate(5, (index) {
+              List.generate(5, (index) {
                 // Détermine la couleur de l'étoile en fonction de l'index
                 Color starColor =
-                    index < restaurant.nbEtoile ? Colors.amber : Colors.grey;
+                index < restaurant!.nbEtoile ? Colors.amber : Colors.grey;
                 return Icon(
                   Icons.star,
                   color: starColor,
@@ -198,26 +200,26 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
                     // adresse
                     Text(
-                      'Adresse: ${restaurant.codeCommune}, ${restaurant.nomCommune}',
+                      'Adresse: ${restaurant!.codeCommune}, ${restaurant!.nomCommune}',
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(height: 8.0),
                     SizedBox(width: double.infinity),
 
-                    if (restaurant.cuisines.isNotEmpty)
-                      // Cuisines
+                    if (restaurant!.cuisines.isNotEmpty)
+                    // Cuisines
                       Text(
-                        'Cuisines: ${restaurant.cuisines.join(', ')}',
+                        'Cuisines: ${restaurant!.cuisines.join(', ')}',
                         style: TextStyle(fontSize: 18),
                       ),
-                      SizedBox(height: 8.0),
+                    SizedBox(height: 8.0),
 
                     // Téléphone
-                    if (restaurant.telephone != "undefined")
+                    if (restaurant!.telephone != "undefined")
                       ElevatedButton.icon(
-                        onPressed: () => _launchPhoneCall(restaurant.telephone),
+                        onPressed: () => _launchPhoneCall(restaurant!.telephone),
                         icon: Icon(Icons.phone),
-                        label: Text("Appeler ${restaurant.telephone}",
+                        label: Text("Appeler ${restaurant!.telephone}",
                             style: TextStyle(color: Colors.black)),
                       ),
 
@@ -225,12 +227,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     SizedBox(width: double.infinity),
 
                     // Site web
-                    if (restaurant.site != "undefined")
+                    if (restaurant!.site != "undefined")
                       ElevatedButton.icon(
-                        onPressed: () => _launchURL(restaurant.site),
+                        onPressed: () => _launchURL(restaurant!.site),
                         icon: Icon(Icons.web),
                         label: Text(
-                          'Site Web: ${restaurant.site}',
+                          'Site Web: ${restaurant!.site}',
                           style: TextStyle(fontSize: 18, color: Colors.black),
                         ),
                       ),
@@ -267,7 +269,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
 
             SizedBox(height: 8.0),
-            for (var commentaire in restaurant.lesCommentaires)
+            for (var commentaire in restaurant!.lesCommentaires)
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
