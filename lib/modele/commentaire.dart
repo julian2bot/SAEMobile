@@ -1,5 +1,7 @@
+import 'package:sae_mobile/API/api_bd.dart';
+
 class Commentaire {
-  final String resto;
+  final String resto; // id restaurant
   final String username;
   final int nbEtoile;
   final String dateCommentaire;
@@ -15,10 +17,10 @@ class Commentaire {
 
   static Commentaire fromJson(Map<String, dynamic> json) {
     return Commentaire(
-      resto: json["resto"] ?? "",
+      resto: json["osmid"] ?? "",
       username: json["username"] ?? "",
-      nbEtoile: json["nbEtoile"] ?? 0,
-      dateCommentaire: json["dateCommentaire"] ?? "",
+      nbEtoile: json["note"] ?? 0,
+      dateCommentaire: json["datecommentaire"] ?? "",
       commentaire: json["commentaire"] ?? "",
     );
   }
@@ -39,4 +41,15 @@ class Commentaire {
     );
   }
 
+  static Commentaire commentaireNull() {
+    return Commentaire.newCommentaire(
+        'undefined', 'undefined', 0, 'undefined', 'undefined');
+  }
+
+  Future<List<String>> getMesPhotos() async {
+    if (this.resto != 'undefined') {
+      return await BdAPI.getPhotosCommentaire(this.resto, this.username);
+    }
+    return [];
+  }
 }
