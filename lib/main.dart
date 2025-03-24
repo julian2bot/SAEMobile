@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:sae_mobile/UI/mytheme.dart';
 import 'UI/restaurantDetaiL.dart';
+import 'router/router.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MaterialApp(
-    // home: await RestaurantDetailPage.create("node/9136326362"), // Freshkin
-    home: await RestaurantDetailPage.create("node/3422189698"), // Cha+
-  ));
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Flutter Demo',
+      routerConfig: router,
+      theme: MyTheme.dark(),
+    );
+  }
 }

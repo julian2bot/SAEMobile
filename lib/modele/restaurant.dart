@@ -81,17 +81,17 @@ class Restaurant {
       lesCommentaires: lesCommentaires,
     );
   }
-
-  static Restaurant restaurantNull() {
-    return Restaurant.newRestaurant(
-      '0',
-      'Unknown',
-      0,
-      '00000',
-      'Unknown',
-      [],
-    );
-  }
+  //
+  // static Restaurant restaurantNull() {
+  //   return Restaurant.newRestaurant(
+  //     '0',
+  //     'Unknown',
+  //     0,
+  //     '00000',
+  //     'Unknown',
+  //     [],
+  //   );
+  // }
 
   Future<List<Commentaire>> getLesCommentaires() async {
     if (this.osmid != '0' && this.lesCommentaires.isEmpty) {
