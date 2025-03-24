@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
-
+import '../UI/Accueil.dart';
 class Test extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ final router = GoRouter(
           GoRoute(
             path: '/',
             name: "home",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/9136326362"),
+            builder: (context, state) => Accueil(),
           ),
           GoRoute(
             path: '/detail/:id',

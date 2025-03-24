@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'UI/restaurantDetaiL.dart';
 import 'UI/Accueil.dart';
 
-import 'package:sae_mobile/UI/mytheme.dart';
+import 'UI/mytheme.dart';
 import 'router/router.dart';
 
 void main() async{
