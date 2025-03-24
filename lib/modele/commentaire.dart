@@ -41,10 +41,10 @@ class Commentaire {
     );
   }
 
-  static Commentaire commentaireNull() {
-    return Commentaire.newCommentaire(
-        'undefined', 'undefined', 0, 'undefined', 'undefined');
-  }
+  // static Commentaire commentaireNull() {
+  //   return Commentaire.newCommentaire(
+  //       'undefined', 'undefined', 0, 'undefined', 'undefined');
+  // }
 
   Future<List<String>> getMesPhotos() async {
     if (this.resto != 'undefined') {

@@ -182,7 +182,7 @@ class BdAPI {
   }
 
   // Récupère un restaurant par son ID
-  static Future<Restaurant> getRestaurantByID(String osmID) async {
+  static Future<Restaurant?> getRestaurantByID(String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase
@@ -199,7 +199,7 @@ class BdAPI {
       print("\n FINAL DATA" + restaurantData.toString());
       return Restaurant.fromJson(restaurantData);
     }
-    return Restaurant.restaurantNull();
+    return null;
   }
 
   // Récupère un restaurant par son nom
@@ -349,7 +349,9 @@ class BdAPI {
         .order('nb', ascending: false);
     List<Restaurant> restos = [];
     for (var rest in data) {
-      restos.add(await getRestaurantByID(rest['osmid']));
+      Restaurant? resto = await getRestaurantByID(rest['osmid']);
+      if(resto!=null)
+        restos.add(resto);
     }
     return restos;
   }
@@ -382,12 +384,12 @@ class BdAPI {
     await initBD();
     final supabase = Supabase.instance.client;
     final data = await supabase.from('avis').select().eq('osmid', osmID);
+    List<Commentaire> lesComms = [];
     if (data.isEmpty) {
-      return {"noteMoy": 0, "commentaires": []};
+      return {"noteMoy": 0, "commentaires": lesComms};
     }
     double noteTotal = 0;
     int count = 0;
-    List<Commentaire> lesComms = [];
     for (var avis in data) {
       if (avis['note'] != null) {
         noteTotal += avis['note'];
@@ -400,7 +402,7 @@ class BdAPI {
   }
 
   // Récupère les commentaires d'un utilisateur pour un restaurant
-  static Future<Commentaire> getCommentairesRestoUser(
+  static Future<Commentaire?> getCommentairesRestoUser(
       String osmID, String username) async {
     await initBD();
     final supabase = Supabase.instance.client;
@@ -411,7 +413,7 @@ class BdAPI {
         .eq('username', username)
         .maybeSingle();
     if (data == null) {
-      return Commentaire.commentaireNull();
+      return null;
     } else {
       return Commentaire.fromJson(data);
     }
@@ -597,7 +599,9 @@ class BdAPI {
         .eq('username', username);
     final List<Restaurant> lesRestos = [];
     for (var resto in data) {
-      lesRestos.add(await getRestaurantByID(resto["osmid"]));
+      Restaurant? restaurantReponse = await getRestaurantByID(resto["osmid"]);
+      if(restaurantReponse!=null)
+        lesRestos.add(restaurantReponse);
     }
     return lesRestos;
   }
