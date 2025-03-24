@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:second_app_td2/UI/Accueil.dart';
 // import 'modele/utilisateur.dart';
 
 // utilisateur creer, get, insert, et delete test / exemple
@@ -80,7 +81,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => Accueil()),
                 );
               },
               child: Text('Connexion'),
