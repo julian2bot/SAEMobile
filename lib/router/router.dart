@@ -4,6 +4,8 @@ import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
+import '../UI/settings.dart';
+
 class Test extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,6 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
               BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Accueil'),
               BottomNavigationBarItem(icon: Icon(Icons.favorite),label: 'Favoris'),
               BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Parametres'),
-              BottomNavigationBarItem(icon: Icon(Icons.logout),label: 'Deconnexion')
             ],
             currentIndex: _selectedIndex,
             onTap: (int idx) => _onItemTapped(idx, context),
@@ -60,9 +61,6 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
         GoRouter.of(context).go(context.namedLocation('favorites'));
       case 2:
         GoRouter.of(context).go(context.namedLocation('settings'));
-      case 3:
-        User.clearUser();
-        GoRouter.of(context).go(context.namedLocation('login'));
     }
   }
 }
@@ -101,7 +99,7 @@ final router = GoRouter(
           GoRoute(
             path: '/settings',
             name: "settings",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/1494206007"),
+            builder: (context, state) => EcranSettings(),
           )
         ]),
     GoRoute(
