@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+  import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -436,21 +438,73 @@ class BdAPI {
     return lesComms;
   }
 
-  // Récupère les photos d'un commentaires
-  static Future<List<String>> getPhotosCommentaire(
-      String osmID, String username) async {
-    await initBD();
+  // // Récupère les photos d'un commentaires
+  // static Future<List<String>> getPhotosCommentaire(
+  //     String osmID, String username) async {
+  //   await initBD();
+  //   final supabase = Supabase.instance.client;
+  //   final data = await supabase
+  //       .from("photo_avis")
+  //       .select("photocommentaire")
+  //       .eq('osmid', osmID)
+  //       .eq('username', username);
+  //   final List<String> res = [];
+  //   for (var photo in data) {
+  //     res.add(photo["photocommentaire"]);
+  //   }
+  //   return res;
+  // }
+
+  static Future<List<Image>> getPhotosCommentaire(String osmID, String username) async {
+    await initBD(); // Assure-toi que la connexion à Supabase est initialisée
+
     final supabase = Supabase.instance.client;
-    final data = await supabase
-        .from("photo_avis")
-        .select("photocommentaire")
-        .eq('osmid', osmID)
-        .eq('username', username);
-    final List<String> res = [];
-    for (var photo in data) {
-      res.add(photo["photocommentaire"]);
+    
+    try {
+      // 1. Récupérer les OID des images
+      final data = await supabase
+          .from("photo_avis")
+          .select("photocommentaire")
+          .eq('osmid', osmID)
+          .eq('username', username);
+
+      if (data == null || data.isEmpty) {
+        print("Aucune photo trouvée.");
+        return [];
+      }
+
+      List<int> oids = [];
+      for (var photo in data) {
+        if (photo["photocommentaire"] != null) {
+          oids.add(photo["photocommentaire"]);
+        }
+      }
+
+      if (oids.isEmpty) {
+        print("Aucun OID valide trouvé.");
+        return [];
+      }
+
+      // 2. Récupérer les images pour chaque OID
+      List<Image> images = [];
+
+      for (int oid in oids) {
+        final response = await supabase.rpc('get_photo_by_oid', params: {'oid_value': oid});
+
+        if (response == null || response is! List<int>) {
+          print("Erreur lors de la récupération de l'image OID $oid");
+          continue;
+        }
+
+        final imageBytes = Uint8List.fromList(response);
+        images.add(Image.memory(imageBytes));
+      }
+
+      return images;
+    } catch (e) {
+      print("Erreur lors de la récupération des images : $e");
+      return [];
     }
-    return res;
   }
 
   // Récupère les photos des commentaires d'un restos

@@ -4,6 +4,8 @@ import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
+import '../UI/testImage.dart';
+
 class Test extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -96,7 +98,8 @@ final router = GoRouter(
           GoRoute(
             path: '/favorites',
             name: "favorites",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/11627058270"),
+            // builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/11627058270"),
+            builder: (context, state) =>GalerieImages(),
           ),
           GoRoute(
             path: '/settings',

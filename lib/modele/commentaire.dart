@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../API/api_bd.dart';
 
 class Commentaire {
@@ -46,7 +48,7 @@ class Commentaire {
   //       'undefined', 'undefined', 0, 'undefined', 'undefined');
   // }
 
-  Future<List<String>> getMesPhotos() async {
+  Future<List<Image>> getMesPhotos() async {
     if (this.resto != 'undefined') {
       return await BdAPI.getPhotosCommentaire(this.resto, this.username);
     }
