@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sae_mobile/modele/commentaire.dart';
+import '../modele/commentaire.dart';
 import '../API/api_bd.dart';
 
 class Restaurant {

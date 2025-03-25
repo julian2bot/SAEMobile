@@ -82,8 +82,10 @@ class MyTheme {
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.black,
+
       ),
       textTheme: lightTextTheme,
+
     );
   }
 
@@ -100,10 +102,11 @@ class MyTheme {
         backgroundColor: Colors.green,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        selectedItemColor: Colors.amber,
-        unselectedItemColor: Colors.purple,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.white,
       ),
       textTheme: darkTextTheme,
+
     );
   }
 }

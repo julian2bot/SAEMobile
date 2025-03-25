@@ -1,4 +1,4 @@
-import 'package:sae_mobile/API/api_bd.dart';
+import '../API/api_bd.dart';
 
 class Commentaire {
   final String resto; // id restaurant
