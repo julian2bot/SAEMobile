@@ -40,6 +40,11 @@ class User {
     return null; 
   }
 
+  static Future<String?> getUserName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("userName"); 
+  }
+
   static Future<bool> isAuthentificated() async{
     return await getUser() != null;
   }

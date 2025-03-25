@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
 import 'package:csv/csv.dart';
+
 import '../modele/restaurant.dart';
 import '../modele/commentaire.dart';
 import '../modele/utilisateur.dart' as utilisateur;
@@ -758,6 +762,48 @@ class BdAPI {
     return true;
   }
 
+
+  static Future<bool> insertCommentairePhoto(
+      String username, String osmID, String commentaire, int note, File? image) async {
+    // ajouter le comm basique
+    bool addcomment = await BdAPI.insertCommentaire(osmID, username, note, commentaire);
+    // verif comm basique
+    if(!addcomment){
+      return false;
+    }
+    await initBD();
+
+
+    final supabase = Supabase.instance.client;
+    final date = DateTime.now().toIso8601String();
+    int? imageOID;
+
+    // Si une image est sélectionnée, on l'upload en Large Object
+    if (image != null) {
+      // trasnformation en byte pour la bd et insert via la fonction bd "insert_large_object"
+      final bytes = await image.readAsBytes();
+      final response = await supabase.rpc('insert_large_object', params: {
+        'image_data': bytes,
+      });
+
+      // si erreur print et return false
+      if (response == null || int.tryParse(response.toString()) == null || int.tryParse(response.toString())! <= 0) {
+        print("Erreur lors de l'upload de l'image : ${response}");
+        return false;
+      }
+      // sinon prendre l'oid de l'image et mettre dans la bd
+
+      await ajoutePhotoCommentaire(osmID,username, response);
+
+      // imageOID = int.parse(response.toString());
+
+      // print("Image uploadée avec succès, OID : $imageOID");
+      // imageOID = response; // Récupère l'OID de l'image
+    }
+
+    return true;
+  }
+
   // Ajoute ou retire un restaurant aux favoris de l'utilisateur
   static Future<bool> ajouteRetirerFavoris(
       String osmID, String username) async {
@@ -805,7 +851,7 @@ class BdAPI {
 
   // Ajoute une image d'un commentaire à la BD
   static Future<bool> ajoutePhotoCommentaire(
-      String osmID, String username, String lienPhoto) async {
+      String osmID, String username, String oIDPhoto) async {
     await initBD();
     final supabase = Supabase.instance.client;
     final response =
@@ -814,7 +860,7 @@ class BdAPI {
             .insert({
       'username': username,
       'osmid': osmID,
-      'photocommentaire': lienPhoto
+      'photocommentaire': oIDPhoto
     }).select();
     return response.isNotEmpty;
   }

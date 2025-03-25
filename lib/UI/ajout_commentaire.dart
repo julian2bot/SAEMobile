@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import '../API/api_bd.dart';
+import '../modele/utilisateur.dart';
 
 class AddComment extends StatefulWidget {
   const AddComment({super.key});
@@ -114,7 +115,7 @@ class _AddCommentState extends State<AddComment> {
 
               // validation
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                       // recup les infos
                     String comment = _commentController.text;
@@ -123,11 +124,33 @@ class _AddCommentState extends State<AddComment> {
                     // Affichage dans la console
                     print("Commentaire : $comment");
                     print("Note : $rating");
+                    String? username = await User.getUserName();
 
                     if (_selectedImage != null) {
                       print("Image sélectionnée : ${_selectedImage!.path}");
+                      if(username != null){
+                        bool success = await BdAPI.insertCommentairePhoto(username, "node/9136326362", comment, rating, _selectedImage);
+
+                        if (success) {
+                          print("Commentaire ajouté avec succès !");
+                        } else {
+                          print("Erreur lors de l'ajout du commentaire.");
+                        }
+
+                      }
                     }else{
+                      if(username != null){
+                        bool success = await BdAPI.insertCommentaire("node/9136326362", username, rating, comment);
+                    
+                        if (success) {
+                          print("Commentaire ajouté avec succès !");
+                        } else {
+                          print("Erreur lors de l'ajout du commentaire.");
+                        }
+                      }
+
                       print("Image sélectionnée : nan");
+                    
                     }
 
 
