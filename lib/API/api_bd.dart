@@ -1010,8 +1010,8 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('utilisateur')
-        .update({'username': newUsername}).eq('username', usernameBefore);
-    if (response.error == null) {
+        .update({'username': newUsername}).eq('username', usernameBefore).select();
+    if (response.isNotEmpty) {
       await userConnecter(newUsername);
       return true;
     }

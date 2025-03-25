@@ -10,46 +10,47 @@ class Test extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ElevatedButton(
+        body: Center(
+      child: ElevatedButton(
         onPressed: () {
           User.saveUser(User(userName: "admin", isAdmin: true));
           context.go(context.namedLocation('home'));
         },
         child: const Text("Login as 'admin'"),
-        ),
-      )
-    );
+      ),
+    ));
   }
 }
 
 class ScaffoldWithNavBar extends StatefulWidget {
   final Widget child;
-  ScaffoldWithNavBar({required this.child,super.key,});
+  ScaffoldWithNavBar({
+    required this.child,
+    super.key,
+  });
 
   @override
-  State<ScaffoldWithNavBar> createState() =>
-      ScaffoldWithNavBarState();
+  State<ScaffoldWithNavBar> createState() => ScaffoldWithNavBarState();
 }
 
-class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
+class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
   int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: widget.child,
-        bottomNavigationBar:
-          BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Accueil'),
-              BottomNavigationBarItem(icon: Icon(Icons.favorite),label: 'Favoris'),
-              BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Parametres'),
-            ],
-            currentIndex: _selectedIndex,
-            onTap: (int idx) => _onItemTapped(idx, context),
-      )
-    );
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.favorite), label: 'Favoris'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings), label: 'Parametres'),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: (int idx) => _onItemTapped(idx, context),
+        ));
   }
 
   void _onItemTapped(int index, BuildContext context) {
@@ -67,9 +68,11 @@ class ScaffoldWithNavBarState extends State<ScaffoldWithNavBar>{
 
 final router = GoRouter(
   initialLocation: '/',
-  onException: (_, GoRouterState state, GoRouter router) {router.go('/404', extra: state.uri.toString()); },
-  redirect: (BuildContext context, GoRouterState state) async{
-    if (! await User.isAuthentificated()) {
+  onException: (_, GoRouterState state, GoRouter router) {
+    router.go('/404', extra: state.uri.toString());
+  },
+  redirect: (BuildContext context, GoRouterState state) async {
+    if (!await User.isAuthentificated()) {
       return '/login';
     } else {
       return null;
@@ -85,22 +88,33 @@ final router = GoRouter(
             path: '/',
             name: "home",
             builder: (context, state) => Accueil(),
+            routes: [
+              GoRoute(
+                path: 'detail/:id',
+                name: "detail",
+                builder: (context, state) =>
+                    RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
+              )
+            ]
           ),
-          GoRoute(
-            path: '/detail/:id',
-            name: "detail",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
-          ),
+
           GoRoute(
             path: '/favorites',
             name: "favorites",
-            builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/11627058270"),
+            builder: (context, state) =>
+                RestaurantDetailPage(idRestaurant: "node/11627058270"),
           ),
           GoRoute(
-            path: '/settings',
-            name: "settings",
-            builder: (context, state) => EcranSettings(),
-          )
+              path: '/settings',
+              name: "settings",
+              builder: (context, state) => EcranSettings(),
+              routes: [
+                GoRoute(
+                  path: 'user',
+                  name: "user",
+                  builder: (context, state) => FormUsername(),
+                )
+              ])
         ]),
     GoRoute(
       path: '/login',
@@ -144,7 +158,8 @@ final router = GoRouter(
     GoRoute(
       path: '/404/:errorMessage',
       name: "404message",
-      builder: (context, state) => Page404(errorMessage:state.pathParameters['errorMessage']),
+      builder: (context, state) =>
+          Page404(errorMessage: state.pathParameters['errorMessage']),
     ),
     GoRoute(
       path: '/404',
