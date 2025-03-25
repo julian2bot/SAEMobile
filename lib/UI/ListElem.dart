@@ -23,42 +23,44 @@ class ListElem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: SizedBox(
-        height: 100,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 1.0,
-              child: CachedNetworkImage(
-                imageUrl: image,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Image.asset(
-                  'assets/images/Boeuf.png',
+      child: Card(
+        child: SizedBox(
+          height: 100,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              AspectRatio(
+                aspectRatio: 1.0,
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/images/Boeuf.png',
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  ),
                   height: 100,
                   width: 100,
                   fit: BoxFit.cover,
                 ),
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
-                child: _ArticleDescription(
-                  nom: nom,
-                  noteMoy: noteMoy,
-                  cuisine: cuisine,
-                  codeCommune: codeCommune,
-                  nomCommune: nomCommune,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
+                  child: _ArticleDescription(
+                    nom: nom,
+                    noteMoy: noteMoy,
+                    cuisine: cuisine,
+                    codeCommune: codeCommune,
+                    nomCommune: nomCommune,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }

@@ -3,6 +3,7 @@ import '../modele/restaurant.dart';
 import 'ListElem.dart';
 import 'restaurantDetaiL.dart';
 import '../API/api_bd.dart';
+import 'package:go_router/go_router.dart';
 
 class Accueil extends StatefulWidget {
   Accueil({super.key});
@@ -76,12 +77,7 @@ class _AccueilState extends State<Accueil> {
               final restaurant = _filteredRestaurants[index];
               return GestureDetector(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => RestaurantDetail(restaurant: restaurant),
-                  //   ),
-                  // );
+                  context.go(context.namedLocation('detail', pathParameters: {'id' : restaurant.osmid.replaceAll("/", "_")}));
                 },
                 child: ListElem(
                   image: restaurant.imageHorizontal,
