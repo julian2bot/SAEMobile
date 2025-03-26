@@ -1,10 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:second_app_td2/UI/homepage.dart';
 import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
 import '../UI/settings.dart';
+import '../UI/inscription.dart';
+import '../UI/connexion.dart';
 
 class Test extends StatelessWidget {
   @override
@@ -73,7 +76,7 @@ final router = GoRouter(
   },
   redirect: (BuildContext context, GoRouterState state) async {
     if (!await User.isAuthentificated()) {
-      return '/login';
+      return '/homepage';
     } else {
       return null;
     }
@@ -85,19 +88,17 @@ final router = GoRouter(
         },
         routes: <RouteBase>[
           GoRoute(
-            path: '/',
-            name: "home",
-            builder: (context, state) => Accueil(),
-            routes: [
-              GoRoute(
-                path: 'detail/:id',
-                name: "detail",
-                builder: (context, state) =>
-                    RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
-              )
-            ]
-          ),
-
+              path: '/',
+              name: "home",
+              builder: (context, state) => Accueil(),
+              routes: [
+                GoRoute(
+                  path: 'detail/:id',
+                  name: "detail",
+                  builder: (context, state) => RestaurantDetailPage(
+                      idRestaurant: state.pathParameters['id']),
+                )
+              ]),
           GoRoute(
             path: '/favorites',
             name: "favorites",
@@ -117,44 +118,66 @@ final router = GoRouter(
               ])
         ]),
     GoRoute(
-      path: '/login',
-      name: "login",
-      builder: (context, state) => Test(),
-      pageBuilder: (context, state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: Test(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            );
-          },
-        );
-      },
-    ),
-    GoRoute(
-      path: '/signin',
-      name: "signin",
-      pageBuilder: (context, state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: Test(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            );
-          },
-        );
-      },
-    ),
+        path: '/homepage',
+        name: "homepage",
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: HomePage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+        routes: [
+          GoRoute(
+            path: 'login',
+            name: "login",
+            pageBuilder: (context, state) {
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: LoginPage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              );
+            },
+          ),
+          GoRoute(
+            path: 'signin',
+            name: "signin",
+            pageBuilder: (context, state) {
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: SigninPage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              );
+            },
+          ),
+        ]),
     GoRoute(
       path: '/404/:errorMessage',
       name: "404message",
