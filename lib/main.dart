@@ -1,65 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:sae_mobile/inscription.dart';
 
-import 'connection.dart';
-import 'inscription.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+// import 'UI/restaurantDetaiL.dart';
+// import 'UI/Accueil.dart';
+
+import 'UI/mytheme.dart';
+import 'router/router.dart';
+import 'viewModels/settingViewModel.dart';
+import 'modele/utilisateur.dart';
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mon Appli',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Bienvenue'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "IUTable O'",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-              child: Text('Connexion'),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SigninPage()),
-                );
-              },
-              child: Text('Inscription'),
-            ),
-          ],
-        ),
-      ),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+              create: (_){
+                SettingViewModel settingViewModel = SettingViewModel();
+                //getSettings est deja appelee dans le constructeur
+                return settingViewModel;
+              }),
+        ],
+    child: Consumer<SettingViewModel>(
+        builder: (context,SettingViewModel notifier,child){
+        return MaterialApp.router(
+          title: 'Flutter Demo',
+          routerConfig: router,
+          theme: notifier.isDark ? MyTheme.dark():MyTheme.light(),
+        );
+      },
+    )
     );
   }
 }
