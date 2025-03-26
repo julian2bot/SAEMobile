@@ -15,22 +15,22 @@ class _SigninPageState extends State<SigninPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController verifyPasswordController = TextEditingController();
-
+  
   void _submit() async {
-    print("Email: ${usernameController.text}, Mot de passe: ${passwordController.text}");
-    if(usernameController.text.isNotEmpty){
+    
+    String username = usernameController.text.trim();
+    print("Email: ${username}, Mot de passe: ${passwordController.text}");
+    if(username.isNotEmpty){
 
       if(passwordController.text==verifyPasswordController.text && passwordController.text.isNotEmpty){
-        if(await BdAPI.usernameExists(usernameController.text)){
+        if(await BdAPI.usernameExists(username)){
           print("user existe deja");
           showPopUp(context, "L'utilisateur existe déjà.", false);
         }
         else{
-          await BdAPI.createUser(usernameController.text, passwordController.text, false);
-          await BdAPI.userConnecter(usernameController.text);
+          await BdAPI.createUser(username, passwordController.text, false);
+          await BdAPI.userConnecter(username);
           GoRouter.of(context).go(context.namedLocation('home'));
-
-        
         }
       }
       else{

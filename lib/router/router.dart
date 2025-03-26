@@ -120,7 +120,6 @@ final router = GoRouter(
     GoRoute(
         path: '/homepage',
         name: "homepage",
-        builder: (context, state) => HomePage(),
         pageBuilder: (context, state) {
           return CustomTransitionPage(
             key: state.pageKey,
@@ -141,7 +140,6 @@ final router = GoRouter(
           GoRoute(
             path: 'login',
             name: "login",
-            builder: (context, state) => LoginPage(),
             pageBuilder: (context, state) {
               return CustomTransitionPage(
                 key: state.pageKey,
