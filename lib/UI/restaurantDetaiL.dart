@@ -103,6 +103,22 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
 
 
+                    // Site web
+                    if (restaurant!.site != "undefined")
+                      ElevatedButton.icon(
+                        onPressed: () => _launchURL(restaurant!.site),
+                        icon: Icon(Icons.web,color: Colors.black),
+                        label: Text(
+                          'Site Web: ${restaurant!.site}',
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16.0),
+
             // Séparateur pour commentaires
             Divider(thickness: 1, color: Colors.grey),
             SizedBox(height: 16.0),
