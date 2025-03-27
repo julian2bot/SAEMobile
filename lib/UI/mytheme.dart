@@ -76,12 +76,12 @@ class MyTheme {
         backgroundColor: Colors.white,
       ),
       cardTheme: CardTheme(
-        shadowColor: Color(0xFF6CB4FF),
+        shadowColor: Color(0xFFFFB469),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           // backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFFFB469)),
-          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF6CB4FF)),
+          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFFFB469)),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
         ),
       ),
@@ -90,7 +90,7 @@ class MyTheme {
         backgroundColor: Colors.black,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        selectedItemColor: Color(0xFF6CB4FF),
+        selectedItemColor: Color(0xFFFFB469),
         unselectedItemColor: Colors.black,
 
       ),
@@ -109,20 +109,20 @@ class MyTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFFFB469)),
+          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF6CB4FF)),
           // backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF6CB4FF)),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
         ),
       ),
       cardTheme: CardTheme(
-        shadowColor: Color(0xFFFFB469),
+        shadowColor: Color(0xFF6CB4FF),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         foregroundColor: Colors.white,
-        backgroundColor: Color(0xFFFFB469),
+        backgroundColor: Color(0xFF6CB4FF),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        selectedItemColor: Color(0xFFFFB469),
+        selectedItemColor: Color(0xFF6CB4FF),
         unselectedItemColor: Colors.white,
       ),
       textTheme: darkTextTheme,
