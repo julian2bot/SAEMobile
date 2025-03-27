@@ -1065,20 +1065,23 @@ class BdAPI {
     final hashedPassword = hashPassword(mdp);
     final supabase = Supabase.instance.client;
     final response = await supabase.from('utilisateur').insert(
-        {'username': username, 'mdp': hashedPassword, 'estadmin': isAdmin});
-    return response.error == null;
+        {'username': username, 'mdp': hashedPassword, 'estadmin': isAdmin}).select();
+    return response.isNotEmpty;
   }
 
   // Vérifie si la connexion est autorisée pour un username et un mdp
   static Future<bool> canLogin(String username, String mdp) async {
     await initBD();
     final hashedPassword = hashPassword(mdp);
+    print("Hashed password in Dart: $hashedPassword");
+
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('utilisateur')
         .select('*')
         .eq('username', username)
         .eq('mdp', hashedPassword)
+        // .eq('mdp', hashedPassword)
         .maybeSingle();
     return response != null;
   }
@@ -1111,8 +1114,8 @@ class BdAPI {
       'username': newUsername,
       'mdp': hashedPassword,
       'estadmin': isAdmin
-    }).eq('username', usernameBefore);
-    return response.error == null;
+    }).eq('username', usernameBefore).select();
+    return response.isNotEmpty;
   }
 
   // Met à jour le nom d'utilisateur
@@ -1125,8 +1128,8 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('utilisateur')
-        .update({'username': newUsername}).eq('username', usernameBefore);
-    if (response.error == null) {
+        .update({'username': newUsername}).eq('username', usernameBefore).select();
+    if (response.isNotEmpty) {
       await userConnecter(newUsername);
       return true;
     }
@@ -1136,7 +1139,8 @@ class BdAPI {
   // UTILITAIRE
 
   static String hashPassword(String password) {
-    return sha256.convert(utf8.encode(password)).toString();
+    String mdp1= sha256.convert(utf8.encode(password)).toString();
+    return sha256.convert(utf8.encode(mdp1)).toString();
   }
 
   static List<String> getAllDays(String firstDay, String lastDay) {
