@@ -69,4 +69,13 @@ class User {
   Future<List<String>> getMesCuisinesPref() async{
     return await BdAPI.getCuisinesPref(this.userName);
   }
+
+  Future<bool> estFavoris(String osmid) async{
+    return await BdAPI.estFavoris(osmid, this.userName);
+  }
+
+  Future<bool> ajoutRetireFavoris(String osmid) async{
+    await BdAPI.ajouteRetirerFavoris(osmid, this.userName);
+    return estFavoris(osmid);
+  }
 }

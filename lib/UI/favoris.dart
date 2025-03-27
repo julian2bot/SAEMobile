@@ -86,12 +86,9 @@ class _FavorisState extends State<Favoris> {
                   context.go(context.namedLocation('detail', pathParameters: {'id' : restaurant.osmid.replaceAll("/", "_")}));
                 },
                 child: ListElem(
+                  restaurant: restaurant,
                   image: restaurant.imageHorizontal,
-                  nom: restaurant.nom,
-                  noteMoy: restaurant.noteMoyen,
-                  cuisine: restaurant.cuisines.join(", "),
-                  codeCommune: restaurant.codeCommune,
-                  nomCommune: restaurant.nomCommune,
+                  estFavoris: true,
                 ),
               );
             },
