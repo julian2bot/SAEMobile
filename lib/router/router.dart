@@ -4,7 +4,6 @@ import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
-import '../UI/testImage.dart';
 
 class Test extends StatelessWidget {
   @override

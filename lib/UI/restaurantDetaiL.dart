@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+
+import "../API/api_bd.dart";
+import '../API/geolocator.dart';
 
 import '../modele/commentaire.dart';
 import '../modele/restaurant.dart';
 
 import 'ajout_commentaire.dart';
-
-import "../API/api_bd.dart";
-import '../API/geolocator.dart';
+import 'commentaire.dart';
+import 'restaurantInfo.dart';
+import 'restaurantHeader.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
   late String? idRestaurant;
@@ -90,169 +92,28 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image du restaurant
-            if (restaurant!.imageHorizontal.isNotEmpty)
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30.0),
-                  child: CachedNetworkImage(
-                    imageUrl: restaurant!.imageHorizontal,
-                    placeholder: (context, url) =>
-                        Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => Image.asset(
-                      'assets/images/Boeuf.png',
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+
+            RestaurantHeader(restaurant: restaurant!),
             SizedBox(height: 16.0),
-
-            // titre / dist
-            Stack(
-              clipBehavior: Clip.none,
-
-              children: [
-                Center(
-                  child: Text(
-                    restaurant!.nom,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                // dist
-                Positioned(
-                  right: 10,
-                  bottom: 60,
-                  child: FutureBuilder<double>(
-                    future: GeoPosition.distance(restaurant!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // chargement
-                      } else if (snapshot.hasError) {
-                        return Text("-- Km");
-                      } else if (snapshot.hasData) {
-                        double distance = snapshot.data!;
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.black45,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            '${distance.toStringAsFixed(1)} km',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      } else {
-                        return Text("-- Km");
-                      }
-                    },
-                  ),
-                ),
-              ],
-            )
-            ,
-
-
-
-            if(restaurant!.nbEtoile != 0)
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children:
-                List.generate(5, (index) {
-                  // Détermine la couleur de l'étoile en fonction de l'index
-                  Color starColor =
-                  index < restaurant!.nbEtoile ? Colors.amber : Colors.grey;
-                  return Icon(
-                    Icons.star,
-                    color: starColor,
-                  );
-                }),
-
-                // SizedBox(width: 4.0),
-                // Text(
-                //   '${restaurant.nbEtoile} étoiles',
-                //   style: TextStyle(fontSize: 18),
-                // ),
-                // ],
-              ),
-              SizedBox(height: 16.0),
+            
 
             // Informations du restaurant dans une carte
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    // adresse
-                    Text(
-                      'Adresse: ${restaurant!.codeCommune}, ${restaurant!.nomCommune}',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(height: 8.0),
-                    SizedBox(width: double.infinity),
-
-                    if (restaurant!.cuisines.isNotEmpty)
-                    // Cuisines
-                      Text(
-                        'Cuisines: ${restaurant!.cuisines.join(', ')}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    SizedBox(height: 8.0),
-
-                    // Téléphone
-                    if (restaurant!.telephone != "undefined")
-                      ElevatedButton.icon(
-                        onPressed: () => _launchPhoneCall(restaurant!.telephone),
-                        icon: Icon(Icons.phone),
-                        label: Text("Appeler ${restaurant!.telephone}",
-                            style: TextStyle(color: Colors.black)),
-                      ),
-
-                    SizedBox(height: 8.0),
-                    SizedBox(width: double.infinity),
-
-                    // Site web
-                    if (restaurant!.site != "undefined")
-                      ElevatedButton.icon(
-                        onPressed: () => _launchURL(restaurant!.site),
-                        icon: Icon(Icons.web),
-                        label: Text(
-                          'Site Web: ${restaurant!.site}',
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            Restaurantinfo(restaurant: restaurant!),
             SizedBox(height: 16.0),
+
+
 
             // Séparateur pour commentaires
             Divider(thickness: 1, color: Colors.grey),
             SizedBox(height: 16.0),
 
+
+
             // Commentaires
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Commentaires:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
@@ -270,124 +131,21 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 8.0),
+            
 
-            SizedBox(height: 8.0),
             
             // debut boucle for
-
             for (var commentaire in restaurant?.lesCommentaires ?? [])
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                margin: EdgeInsets.symmetric(vertical: 4.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // nom utilisateur + date
-                      Row(
-                        children: [
-                          Icon(Icons.person),
-                          SizedBox(width: 8.0),
-                          Text(
-                            commentaire.username,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          Spacer(),
-                          Text(
-                            commentaire.dateCommentaire,
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.0),
-                      
-                      // commentaire
-                      Text(
-                        commentaire.commentaire,
-                        style: TextStyle(fontSize: 16),
-                      ),
-
-                      SizedBox(height: 8.0),
-
-                      //  charger les images
-                      FutureBuilder<List<Image>>(
-                        future: commentaire.getMesPhotos(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator(); 
-                          } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-                            return SizedBox(); 
-                          }
-
-                          return Wrap(
-                            spacing: 8.0,
-                            children: snapshot.data!.map((image) {
-                              return GestureDetector(
-                                onTap: () {
-                                  // pour afficher en plus grands
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => Dialog(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child:ClipRRect(
-                                          borderRadius: BorderRadius.circular(25.0), 
-                                          child: Image(image: image.image),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-
-                                // pour afficher en petit
-                                child: SizedBox(
-                                  width: 60, 
-                                  height: 60,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    child: image, 
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-
-
-
-
+              CommentaireDetail(commentaire: commentaire),
               // fin boucle for
+
+
           ],
         ),
       ),
     );
   }
 
-  void _launchURL(String url) async {
-    Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Impossible d\'ouvrir l\'URL : $url';
-    }
-  }
 
-  void _launchPhoneCall(String phoneNumber) async {
-    Uri uri = Uri.parse('tel:$phoneNumber');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Impossible d\'ouvrir le numéro : $phoneNumber';
-    }
-  }
 }
