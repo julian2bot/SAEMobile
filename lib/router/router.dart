@@ -99,7 +99,7 @@ final router = GoRouter(
             path: '/favorites',
             name: "favorites",
             // builder: (context, state) => RestaurantDetailPage(idRestaurant: "node/11627058270"),
-            builder: (context, state) =>GalerieImages(),
+            builder: (context, state) =>Accueil(),
           ),
           GoRoute(
             path: '/settings',

@@ -455,57 +455,80 @@ class BdAPI {
   //   return res;
   // }
 
-  static Future<List<Image>> getPhotosCommentaire(String osmID, String username) async {
-    await initBD(); // Assure-toi que la connexion à Supabase est initialisée
-
+  static Future<List<String>> getPhotosCommentaire(String osmID, String username) async {
+    await initBD();
     final supabase = Supabase.instance.client;
-    
-    try {
-      // 1. Récupérer les OID des images
-      final data = await supabase
-          .from("photo_avis")
-          .select("photocommentaire")
-          .eq('osmid', osmID)
-          .eq('username', username);
 
-      if (data == null || data.isEmpty) {
-        print("Aucune photo trouvée.");
-        return [];
-      }
+    final response = await supabase
+        .from('photo_avis')
+        .select('photoid')
+        .eq('osmid', osmID)
+        .eq('username', username);
 
-      List<int> oids = [];
-      for (var photo in data) {
-        if (photo["photocommentaire"] != null) {
-          oids.add(photo["photocommentaire"]);
-        }
-      }
-
-      if (oids.isEmpty) {
-        print("Aucun OID valide trouvé.");
-        return [];
-      }
-
-      // 2. Récupérer les images pour chaque OID
-      List<Image> images = [];
-
-      for (int oid in oids) {
-        final response = await supabase.rpc('get_photo_by_oid', params: {'oid_value': oid});
-
-        if (response == null || response is! List<int>) {
-          print("Erreur lors de la récupération de l'image OID $oid");
-          continue;
-        }
-
-        final imageBytes = Uint8List.fromList(response);
-        images.add(Image.memory(imageBytes));
-      }
-
-      return images;
-    } catch (e) {
-      print("Erreur lors de la récupération des images : $e");
+    if (response.isEmpty) {
       return [];
     }
+
+    // Récupérer les URLs des images stockées
+    List<String> imageUrls = response.map<String>((row) {
+      return supabase.storage.from("imagecommentaire").getPublicUrl(row['photoid']);
+    }).toList();
+
+    return imageUrls;
   }
+
+
+  // static Future<List<Image>> getPhotosCommentaire(String osmID, String username) async {
+  //   await initBD(); // Assure-toi que la connexion à Supabase est initialisée
+
+  //   final supabase = Supabase.instance.client;
+    
+  //   try {
+  //     // 1. Récupérer les OID des images
+  //     final data = await supabase
+  //         .from("photo_avis")
+  //         .select("photocommentaire")
+  //         .eq('osmid', osmID)
+  //         .eq('username', username);
+
+  //     if (data == null || data.isEmpty) {
+  //       print("Aucune photo trouvée.");
+  //       return [];
+  //     }
+
+  //     List<int> oids = [];
+  //     for (var photo in data) {
+  //       if (photo["photocommentaire"] != null) {
+  //         oids.add(photo["photocommentaire"]);
+  //       }
+  //     }
+
+  //     if (oids.isEmpty) {
+  //       print("Aucun OID valide trouvé.");
+  //       return [];
+  //     }
+
+  //     // 2. Récupérer les images pour chaque OID
+  //     List<Image> images = [];
+
+  //     for (int oid in oids) {
+  //       final response = await supabase.rpc('get_photo_by_oid', params: {'oid_value': oid});
+
+  //       if (response == null || response is! List<int>) {
+  //         print("Erreur lors de la récupération de l'image OID $oid");
+  //         continue;
+  //       }
+
+  //       final imageBytes = Uint8List.fromList(response);
+  //       images.add(Image.memory(imageBytes));
+  //     }
+
+  //     return images;
+  //   } catch (e) {
+  //     print("Erreur lors de la récupération des images : $e");
+  //     return [];
+  //   }
+  // }
 
   // Récupère les photos des commentaires d'un restos
   static Future<List<String>> getPhotosCommentairesResto(String osmID) async {
@@ -825,35 +848,9 @@ class BdAPI {
     if(!addcomment){
       return false;
     }
-    await initBD();
-
-
-    final supabase = Supabase.instance.client;
-    final date = DateTime.now().toIso8601String();
-    int? imageOID;
-
-    // Si une image est sélectionnée, on l'upload en Large Object
-    if (image != null) {
-      // trasnformation en byte pour la bd et insert via la fonction bd "insert_large_object"
-      final bytes = await image.readAsBytes();
-      final response = await supabase.rpc('insert_large_object', params: {
-        'image_data': bytes,
-      });
-
-      // si erreur print et return false
-      if (response == null || int.tryParse(response.toString()) == null || int.tryParse(response.toString())! <= 0) {
-        print("Erreur lors de l'upload de l'image : ${response}");
-        return false;
-      }
-      // sinon prendre l'oid de l'image et mettre dans la bd
-
-      await ajoutePhotoCommentaire(osmID,username, response);
-
-      // imageOID = int.parse(response.toString());
-
-      // print("Image uploadée avec succès, OID : $imageOID");
-      // imageOID = response; // Récupère l'OID de l'image
-    }
+    // await initBD();
+    
+    await ajoutePhotoCommentaire(osmID,username, image! );
 
     return true;
   }
@@ -905,18 +902,36 @@ class BdAPI {
 
   // Ajoute une image d'un commentaire à la BD
   static Future<bool> ajoutePhotoCommentaire(
-      String osmID, String username, String oIDPhoto) async {
+      String osmID, String username, File photo) async {
     await initBD();
+    
+    final fileName = DateTime.now().microsecondsSinceEpoch.toString();
+
+    final path = "uploads/$fileName";
     final supabase = Supabase.instance.client;
+
+    
     final response =
         await supabase // Gère automatiquement l'id de la photo gràce à l'option is identity mise sur la colone dans supabase
             .from('photo_avis')
             .insert({
       'username': username,
       'osmid': osmID,
-      'photocommentaire': oIDPhoto
+      'photoid': path
     }).select();
+
+
+    await Supabase.instance.client.storage
+      .from("imagecommentaire")
+      .upload(path, photo!)
+      .then((value) {
+        print("Image bien uploadée : $value");
+      }).catchError((error) {
+        print("Erreur lors de l'upload : $error");
+        return false;
+      });
     return response.isNotEmpty;
+  
   }
 
   // Delete

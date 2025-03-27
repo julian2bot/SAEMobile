@@ -50,8 +50,10 @@ class Commentaire {
 
   Future<List<Image>> getMesPhotos() async {
     if (this.resto != 'undefined') {
-      return await BdAPI.getPhotosCommentaire(this.resto, this.username);
+      List<String> urls = await BdAPI.getPhotosCommentaire(this.resto, this.username);
+      return urls.map((url) => Image.network(url)).toList();
     }
     return [];
   }
+
 }

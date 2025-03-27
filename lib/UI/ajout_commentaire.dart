@@ -6,7 +6,8 @@ import '../API/api_bd.dart';
 import '../modele/utilisateur.dart';
 
 class AddComment extends StatefulWidget {
-  const AddComment({super.key});
+  final String restaurantId;
+  const AddComment({super.key, required this.restaurantId});
 
   @override
   State<AddComment> createState() => _AddCommentState();
@@ -124,12 +125,16 @@ class _AddCommentState extends State<AddComment> {
                     // Affichage dans la console
                     print("Commentaire : $comment");
                     print("Note : $rating");
+                    
                     String? username = await User.getUserName();
+                    print("username: ${username}");
+                    print("osmid: ${widget.restaurantId}");
+
 
                     if (_selectedImage != null) {
                       print("Image sélectionnée : ${_selectedImage!.path}");
                       if(username != null){
-                        bool success = await BdAPI.insertCommentairePhoto(username, "node/9136326362", comment, rating, _selectedImage);
+                        bool success = await BdAPI.insertCommentairePhoto(username, widget.restaurantId, comment, rating, _selectedImage);
 
                         if (success) {
                           print("Commentaire ajouté avec succès !");
@@ -140,7 +145,7 @@ class _AddCommentState extends State<AddComment> {
                       }
                     }else{
                       if(username != null){
-                        bool success = await BdAPI.insertCommentaire("node/9136326362", username, rating, comment);
+                        bool success = await BdAPI.insertCommentaire(widget.restaurantId, username, rating, comment);
                     
                         if (success) {
                           print("Commentaire ajouté avec succès !");

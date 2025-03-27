@@ -257,13 +257,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(Icons.add_comment_outlined),
                   onPressed: () {
                     print("creer un commentaire");
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AddComment()),
+                          builder: (context) => AddComment(restaurantId: restaurant?.osmid??""),
+                        ),
                     );
                   },
                 ),
@@ -271,7 +272,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
 
             SizedBox(height: 8.0),
-            for (var commentaire in restaurant!.lesCommentaires)
+            
+            // debut boucle for
+
+            for (var commentaire in restaurant?.lesCommentaires ?? [])
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -283,33 +287,86 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // nom utilisateur + date
                       Row(
                         children: [
                           Icon(Icons.person),
                           SizedBox(width: 8.0),
                           Text(
-                            commentaire
-                                .username, // Remplacez par le nom d'utilisateur réel
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            commentaire.username,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Spacer(),
                           Text(
-                            commentaire
-                                .dateCommentaire, // Remplacez par la date réelle
+                            commentaire.dateCommentaire,
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
                       SizedBox(height: 4.0),
+                      
+                      // commentaire
                       Text(
                         commentaire.commentaire,
                         style: TextStyle(fontSize: 16),
+                      ),
+
+                      SizedBox(height: 8.0),
+
+                      //  charger les images
+                      FutureBuilder<List<Image>>(
+                        future: commentaire.getMesPhotos(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator(); 
+                          } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                            return SizedBox(); 
+                          }
+
+                          return Wrap(
+                            spacing: 8.0,
+                            children: snapshot.data!.map((image) {
+                              return GestureDetector(
+                                onTap: () {
+                                  // pour afficher en plus grands
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child:ClipRRect(
+                                          borderRadius: BorderRadius.circular(25.0), 
+                                          child: Image(image: image.image),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+
+                                // pour afficher en petit
+                                child: SizedBox(
+                                  width: 60, 
+                                  height: 60,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    child: image, 
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
+
+
+
+
+
+              // fin boucle for
           ],
         ),
       ),
