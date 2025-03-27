@@ -6,7 +6,7 @@ import '../API/api_bd.dart';
 import 'package:go_router/go_router.dart';
 
 class Accueil extends StatefulWidget {
-  Accueil({super.key});
+  const Accueil({super.key});
 
   @override
   _AccueilState createState() => _AccueilState();
@@ -16,7 +16,7 @@ class _AccueilState extends State<Accueil> {
   late Future<List<Restaurant>> restaurantsFuture;
   List<Restaurant> _restaurants = [];
   List<Restaurant> _filteredRestaurants = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _AccueilState extends State<Accueil> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Rechercher un restaurant...",
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
               ),
               onChanged: _filterRestaurants,
@@ -65,7 +65,7 @@ class _AccueilState extends State<Accueil> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erreur : \${snapshot.error}"));
+            return const Center(child: Text("Erreur : \${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("Aucun restaurant disponible"));
           }

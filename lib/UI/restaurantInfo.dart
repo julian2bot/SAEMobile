@@ -44,40 +44,40 @@ class Restaurantinfo extends StatelessWidget {
 
                     // adresse
                     Text(
-                      'Adresse: ${restaurant!.codeCommune}, ${restaurant!.nomCommune}',
-                      style: TextStyle(fontSize: 18),
+                      'Adresse: ${restaurant.codeCommune}, ${restaurant.nomCommune}',
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    SizedBox(height: 8.0),
-                    SizedBox(width: double.infinity),
+                    const SizedBox(height: 8.0),
+                    const SizedBox(width: double.infinity),
 
-                    if (restaurant!.cuisines.isNotEmpty)
+                    if (restaurant.cuisines.isNotEmpty)
                     // Cuisines
                       Text(
-                        'Cuisines: ${restaurant!.cuisines.join(', ')}',
-                        style: TextStyle(fontSize: 18),
+                        'Cuisines: ${restaurant.cuisines.join(', ')}',
+                        style: const TextStyle(fontSize: 18),
                       ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
 
                     // Téléphone
-                    if (restaurant!.telephone != "undefined")
+                    if (restaurant.telephone != "undefined")
                       ElevatedButton.icon(
-                        onPressed: () => _launchPhoneCall(restaurant!.telephone),
-                        icon: Icon(Icons.phone),
-                        label: Text("Appeler ${restaurant!.telephone}",
-                            style: TextStyle(color: Colors.black)),
+                        onPressed: () => _launchPhoneCall(restaurant.telephone),
+                        icon: const Icon(Icons.phone, color: Colors.black,),
+                        label: Text("Appeler ${restaurant.telephone}",
+                            style: const TextStyle(color: Colors.black),),
                       ),
 
-                    SizedBox(height: 8.0),
-                    SizedBox(width: double.infinity),
+                    const SizedBox(height: 8.0),
+                    const SizedBox(width: double.infinity),
 
                     // Site web
-                    if (restaurant!.site != "undefined")
+                    if (restaurant.site != "undefined")
                       ElevatedButton.icon(
-                        onPressed: () => _launchURL(restaurant!.site),
-                        icon: Icon(Icons.web),
+                        onPressed: () => _launchURL(restaurant.site),
+                        icon: const Icon(Icons.web, color: Colors.black,),
                         label: Text(
-                          'Site Web: ${restaurant!.site}',
-                          style: TextStyle(fontSize: 18, color: Colors.black),
+                          'Site Web: ${restaurant.site}',
+                          style: const TextStyle(fontSize: 18, color: Colors.black),
                         ),
                       ),
                   ],

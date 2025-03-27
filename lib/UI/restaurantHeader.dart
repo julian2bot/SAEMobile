@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import "package:geolocator/geolocator.dart";
+// import "package:geolocator/geolocator.dart";
 
 import '../modele/restaurant.dart';
 import "../API/geolocator.dart";
@@ -35,7 +35,7 @@ class RestaurantHeader extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: restaurant.imageHorizontal,
                 placeholder: (context, url) =>
-                    Center(child: CircularProgressIndicator()),
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => Image.asset(
                   'assets/images/Boeuf.png',
                   height: 200,
@@ -49,7 +49,7 @@ class RestaurantHeader extends StatelessWidget {
             ),
           ),
 
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
 
         Stack(
           clipBehavior: Clip.none,
@@ -58,7 +58,7 @@ class RestaurantHeader extends StatelessWidget {
             Center(
               child: Text(
                 restaurant.nom,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
 
@@ -74,24 +74,24 @@ class RestaurantHeader extends StatelessWidget {
                   future: GeoPosition.distance(restaurant),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator(); // chargement
+                      return const CircularProgressIndicator(); // chargement
                     } else if (snapshot.hasError) {
-                      return Text("-- Km");
+                      return const Text("-- Km");
                     } else if (snapshot.hasData) {
                       double distance = snapshot.data!;
                       return Container(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.black45,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Text(
                           '${distance.toStringAsFixed(1)} km',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       );
                     } else {
-                      return Text("-- Km");
+                      return const Text("-- Km");
                     }
                   },
                 ),
@@ -104,7 +104,7 @@ class RestaurantHeader extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 12.0),
+        const SizedBox(height: 12.0),
 
         if (restaurant.nbEtoile != 0)
           Row(
@@ -116,7 +116,7 @@ class RestaurantHeader extends StatelessWidget {
             }),
           ),
 
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
       ],
     );
   }

@@ -21,7 +21,7 @@ class ImageCommentaireDetail extends StatelessWidget {
               context: context,
               builder: (_) => Dialog(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child:ClipRRect(
                     borderRadius: BorderRadius.circular(25.0), 
                     child: Image(image: image.image),

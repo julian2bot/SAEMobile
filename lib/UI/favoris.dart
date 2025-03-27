@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../modele/utilisateur.dart';
 
 class Favoris extends StatefulWidget {
-  Favoris({super.key});
+  const Favoris({super.key});
 
   @override
   _FavorisState createState() => _FavorisState();
@@ -47,8 +47,8 @@ class _FavorisState extends State<Favoris> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text("Chargement des favoris")),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text("Chargement des favoris")),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -69,7 +69,7 @@ class _FavorisState extends State<Favoris> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erreur : \${snapshot.error}"));
+            return const Center(child: Text("Erreur : \${snapshot.error}"));
           }
 
           if(_restaurants.isEmpty){

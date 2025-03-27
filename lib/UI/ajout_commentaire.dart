@@ -65,7 +65,7 @@ class _AddCommentState extends State<AddComment> {
               const SizedBox(height: 20),
 
               // Sélection de la note avec étoiles
-              Text("Note :", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text("Note :", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: List.generate(5, (index) {
@@ -87,22 +87,46 @@ class _AddCommentState extends State<AddComment> {
 
 
 
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     ElevatedButton.icon(
+              //       icon: const Icon(Icons.image),
+              //       label: const Text(""),
+              //       onPressed: () => _pickImage(ImageSource.gallery),
+              //     ),
+              //     ElevatedButton.icon(
+              //       icon: const Icon(Icons.camera),
+              //       label: const Text(""),
+              //       onPressed: () => _pickImage(ImageSource.camera),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 20),
+
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end, // Aligner à droite
                 children: [
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.image),
-                    label: Text("Depuis la galerie"),
+                  ElevatedButton(
                     onPressed: () => _pickImage(ImageSource.gallery),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12), // Ajuster la taille des boutons
+                      shape: const CircleBorder(), // Boutons ronds
+                    ),
+                    child: const Icon(Icons.image),
                   ),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.camera),
-                    label: Text("Prendre une photo"),
+                  const SizedBox(width: 10), // Espace de 20px
+                  ElevatedButton(
                     onPressed: () => _pickImage(ImageSource.camera),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Icon(Icons.camera),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+
 
               // Affichage de l'image sélectionnée
               if (_selectedImage != null)

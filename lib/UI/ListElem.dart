@@ -27,7 +27,7 @@ class _ListElemState extends State<ListElem> {
     setState(() {
       widget.estFavoris = fav;
       widget.user = user;
-    });;
+    });
   }
 
   @override
@@ -39,13 +39,13 @@ class _ListElemState extends State<ListElem> {
         child: SizedBox(
           height: 100,
           child: Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child:Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
 
                   AspectRatio(
-                    aspectRatio: 2.0,
+                    aspectRatio: 1.0,
                     child: CachedNetworkImage(
                       imageUrl: widget.image,
                       placeholder: (context, url) => const Center(child: CircularProgressIndicator()),

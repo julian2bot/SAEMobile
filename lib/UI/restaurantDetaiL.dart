@@ -70,14 +70,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text("Chargement du restaurant")),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text("Chargement du restaurant")),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: Text("Erreur")),
+        appBar: AppBar(title: const Text("Erreur")),
         body: Center(child: Text(errorMessage!)),
       );
     }
@@ -87,41 +87,24 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         title: Text(restaurant!.nom),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image du restaurant
 
             RestaurantHeader(restaurant: restaurant!),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             
 
             // Informations du restaurant dans une carte
             Restaurantinfo(restaurant: restaurant!),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
 
-
-
-                    // Site web
-                    if (restaurant!.site != "undefined")
-                      ElevatedButton.icon(
-                        onPressed: () => _launchURL(restaurant!.site),
-                        icon: Icon(Icons.web,color: Colors.black),
-                        label: Text(
-                          'Site Web: ${restaurant!.site}',
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16.0),
 
             // Séparateur pour commentaires
-            Divider(thickness: 1, color: Colors.grey),
-            SizedBox(height: 16.0),
+            const Divider(thickness: 1, color: Colors.grey),
+            const SizedBox(height: 16.0),
 
 
 

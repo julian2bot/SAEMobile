@@ -27,37 +27,37 @@ class CommentaireDetail extends StatelessWidget {
                       // nom utilisateur + date
                       Row(
                         children: [
-                          Icon(Icons.person),
-                          SizedBox(width: 8.0),
+                          const Icon(Icons.person),
+                          const SizedBox(width: 8.0),
                           Text(
                             commentaire.username,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           Text(
                             commentaire.dateCommentaire,
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       
                       // commentaire
                       Text(
                         commentaire.commentaire,
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
 
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
 
                       //  charger les images
                       FutureBuilder<List<Image>>(
                         future: commentaire.getMesPhotos(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator(); 
+                            return const CircularProgressIndicator(); 
                           } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-                            return SizedBox(); 
+                            return const SizedBox(); 
                           }
                           return ImageCommentaireDetail(snapshot:snapshot);
                         },
