@@ -220,7 +220,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     if (restaurant!.telephone != "undefined")
                       ElevatedButton.icon(
                         onPressed: () => _launchPhoneCall(restaurant!.telephone),
-                        icon: Icon(Icons.phone),
+                        icon: Icon(Icons.phone, color: Colors.black,),
                         label: Text("Appeler ${restaurant!.telephone}",
                             style: TextStyle(color: Colors.black)),
                       ),
@@ -232,7 +232,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     if (restaurant!.site != "undefined")
                       ElevatedButton.icon(
                         onPressed: () => _launchURL(restaurant!.site),
-                        icon: Icon(Icons.web),
+                        icon: Icon(Icons.web,color: Colors.black),
                         label: Text(
                           'Site Web: ${restaurant!.site}',
                           style: TextStyle(fontSize: 18, color: Colors.black),
