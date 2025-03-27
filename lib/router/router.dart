@@ -5,6 +5,7 @@ import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
 import '../UI/settings.dart';
+import '../UI/favoris.dart';
 
 class Test extends StatelessWidget {
   @override
@@ -97,12 +98,10 @@ final router = GoRouter(
               )
             ]
           ),
-
           GoRoute(
             path: '/favorites',
             name: "favorites",
-            builder: (context, state) =>
-                RestaurantDetailPage(idRestaurant: "node/11627058270"),
+            builder: (context, state) => Favoris(),
           ),
           GoRoute(
               path: '/settings',
