@@ -6,6 +6,7 @@ import '../modele/utilisateur.dart';
 import '../UI/404.dart';
 import '../UI/Accueil.dart';
 import '../UI/settings.dart';
+import '../UI/favoris.dart';
 import '../UI/inscription.dart';
 import '../UI/connexion.dart';
 
@@ -88,22 +89,22 @@ final router = GoRouter(
         },
         routes: <RouteBase>[
           GoRoute(
-              path: '/',
-              name: "home",
-              builder: (context, state) => Accueil(),
-              routes: [
-                GoRoute(
-                  path: 'detail/:id',
-                  name: "detail",
-                  builder: (context, state) => RestaurantDetailPage(
-                      idRestaurant: state.pathParameters['id']),
-                )
-              ]),
+            path: '/',
+            name: "home",
+            builder: (context, state) => Accueil(),
+            routes: [
+              GoRoute(
+                path: 'detail/:id',
+                name: "detail",
+                builder: (context, state) =>
+                    RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
+              )
+            ]
+          ),
           GoRoute(
             path: '/favorites',
             name: "favorites",
-            builder: (context, state) =>
-                RestaurantDetailPage(idRestaurant: "node/11627058270"),
+            builder: (context, state) => Favoris(),
           ),
           GoRoute(
               path: '/settings',
