@@ -313,7 +313,8 @@ class BdAPI {
   static Future<List<String>> getAllCuisinesResto() async {
     await initBD();
     final supabase = Supabase.instance.client;
-    final data = await supabase.from('cuisine').select('DISTINCT(nomcuisine)');
+    final data = await supabase.from('cuisine').select('nomcuisine');
+    print(data);
     return data.map((e) => e['nomcuisine'] as String).toList();
   }
 

@@ -39,7 +39,6 @@ class Restaurant {
   });
 
   static Restaurant fromJson(Map<String, dynamic> json) {
-    print("\n FROM JSON \n");
     return Restaurant(
       osmid: json["osmid"] ?? "",
       nom: json["nomrestaurant"] ?? "",
