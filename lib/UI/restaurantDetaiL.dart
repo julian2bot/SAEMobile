@@ -123,11 +123,21 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddComment(restaurantId: restaurant?.osmid??""),
-                        ),
+                        builder: (context) =>
+                            AddComment(restaurantId: restaurant?.osmid ?? ""),
+                      ),
+                    ).then((result) {
+                      if (result != null) {
+                        restaurant!.getLesCommentaires()
+                            .then((_) {
+                          setState(() {
+                            _loadRestaurant();
+                          });
+                        });
+                      }
+                    }
                     );
-                  },
-                ),
+                  })
               ],
             ),
             const SizedBox(height: 8.0),

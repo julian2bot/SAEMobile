@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../API/api_bd.dart';
 import '../modele/utilisateur.dart';
+import './popUp.dart';
 
 class AddComment extends StatefulWidget {
   final String restaurantId;
@@ -160,22 +161,13 @@ class _AddCommentState extends State<AddComment> {
                       if(username != null){
                         bool success = await BdAPI.insertCommentairePhoto(username, widget.restaurantId, comment, rating, _selectedImage);
 
-                        if (success) {
-                          print("Commentaire ajouté avec succès !");
-                        } else {
-                          print("Erreur lors de l'ajout du commentaire.");
-                        }
-
+                        showPopUp(context, success ? "Commentaire ajouté avec succès !" : "Erreur lors de l'ajout du commentaire." , success);
                       }
                     }else{
                       if(username != null){
                         bool success = await BdAPI.insertCommentaire(widget.restaurantId, username, rating, comment);
-                    
-                        if (success) {
-                          print("Commentaire ajouté avec succès !");
-                        } else {
-                          print("Erreur lors de l'ajout du commentaire.");
-                        }
+
+                        showPopUp(context, success ? "Commentaire ajouté avec succès !" : "Erreur lors de l'ajout du commentaire." , success);
                       }
 
                       print("Image sélectionnée : nan");
@@ -188,6 +180,7 @@ class _AddCommentState extends State<AddComment> {
                     setState(() {
                       _selectedRating = 0; 
                     });
+                    Navigator.pop(context, 'Nouveau commentaire');
                   }
                 },
                 child: const Text('Ajouter le commentaire'),
