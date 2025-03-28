@@ -106,7 +106,8 @@ final router = GoRouter(
           GoRoute(
             path: '/favorites',
             name: "favorites",
-            builder: (context, state) => CuisinesFavoris(),
+            // builder: (context, state) => CuisinesFavoris(),
+            builder: (context, state) => Favoris(),
           ),
           GoRoute(
               path: '/settings',
