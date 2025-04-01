@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../API/api_bd.dart';
 import '../modele/utilisateur.dart';
+import '../modele/commentaire.dart';
 import './popUp.dart';
 
 class AddComment extends StatefulWidget {
@@ -15,9 +16,10 @@ class AddComment extends StatefulWidget {
 }
 
 class _AddCommentState extends State<AddComment> {
+  bool loaded = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  File? _selectedImage; 
-
+  File? _selectedImage;
+  Commentaire? comm;
   // Controllers pour récupérer le texte saisi
   final TextEditingController _commentController = TextEditingController();
 
@@ -34,14 +36,34 @@ class _AddCommentState extends State<AddComment> {
           _selectedImage = File(image.path); // Convertit en fichier pour l'affichage
         });
       }
-    }
+  }
 
+  Future<void> _loadComm() async {
+    User user = (await User.getUser())!;
+    Commentaire? commentaire = await BdAPI.getCommentairesRestoUser(widget.restaurantId, user.userName);
 
+    setState(() {
+      loaded = true;
+      comm = commentaire;
+      _commentController.text = ((comm != null) ? comm!.commentaire : "");
+      _selectedRating = ((comm != null) ? comm!.nbEtoile : 0);
+    });
+  }
 
-
+  @override
+  void initState(){
+    super.initState();
+    _loadComm();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (! loaded) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Chargement du commentaire")),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: const Text("Ajouter un commentaire")),
       body: Padding(
