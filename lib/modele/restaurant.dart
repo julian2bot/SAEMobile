@@ -34,7 +34,7 @@ class Restaurant {
     this.imageHorizontal = "",
     this.noteMoyen = 0,
     this.lesCommentaires = const [],
-    this.longitude =0,
+    this.longitude = 0,
     this.latitude = 0,
   });
 
@@ -127,11 +127,16 @@ class Restaurant {
   //   return [];
   // }
 
-    // Future<List<Image>> getMesPhotos() async {
-    //   if (this.osmid != '0') {
-    //     List<String> urls = await BdAPI.getPhotosCommentairesResto(osmid);
-    //   return urls.map((url) => Image.network(url)).toList();
-    // }
-    // return [];
-  // }
+  Future<List<Image>> getMesPhotosCommentaire() async {
+    return await BdAPI.getPhotosCommentairesResto(osmid);
+  }
+
+  Future<Image?> getPhotoCommentaire() async {
+    List<Image> LesImagesComm = await this.getMesPhotosCommentaire();
+
+    if (LesImagesComm.isNotEmpty) {
+      return LesImagesComm[0];
+    }
+    return null;
+  }
 }
