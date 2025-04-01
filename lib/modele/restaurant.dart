@@ -120,10 +120,18 @@ class Restaurant {
     return this.cuisines;
   }
 
-  Future<List<String>> getMesPhotosCommentaire() async {
-    if (this.osmid != '0') {
-      return await BdAPI.getPhotosCommentairesResto(this.osmid);
-    }
-    return [];
-  }
+  // Future<List<String>> getMesPhotosCommentaire() async {
+  //   if (this.osmid != '0') {
+  //     return await BdAPI.getPhotosCommentairesResto(this.osmid);
+  //   }
+  //   return [];
+  // }
+
+    // Future<List<Image>> getMesPhotos() async {
+    //   if (this.osmid != '0') {
+    //     List<String> urls = await BdAPI.getPhotosCommentairesResto(osmid);
+    //   return urls.map((url) => Image.network(url)).toList();
+    // }
+    // return [];
+  // }
 }
