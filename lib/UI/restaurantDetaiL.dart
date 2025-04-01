@@ -109,38 +109,61 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
 
             // Commentaires
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Commentaires:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Commentaires:',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_comment_outlined),
+                      onPressed: () {
+                        print("creer un commentaire");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddComment(restaurantId: restaurant?.osmid ?? ""),
+                          ),
+                        ).then((result) {
+                          if (result != null) {
+                            restaurant!.getLesCommentaires()
+                                .then((_) {
+                              setState(() {
+                                _loadRestaurant();
+                              });
+                            });
+                          }
+                        }
+                        );
+                      })
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add_comment_outlined),
-                  onPressed: () {
-                    print("creer un commentaire");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AddComment(restaurantId: restaurant?.osmid ?? ""),
-                      ),
-                    ).then((result) {
-                      if (result != null) {
-                        restaurant!.getLesCommentaires()
-                            .then((_) {
-                          setState(() {
-                            _loadRestaurant();
-                          });
-                        });
-                      }
-                    }
-                    );
-                  })
-              ],
-            ),
-            const SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
+
+              if (restaurant!.noteMoyen != 0)
+                Row(children: [
+                  const Text("NOTE MOYENNE: ",
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold), 
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: List.generate(5, (index) {
+                        Color starColor =
+                            index < restaurant!.noteMoyen ? Colors.amber : Colors.grey;
+                        return Icon(Icons.star, color: starColor);
+                      }),
+                    ),
+
+                  const SizedBox(height: 16.0),
+                ]
+              ),      
+            ],),
             
 
             
