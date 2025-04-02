@@ -13,6 +13,7 @@ import 'ajout_commentaire.dart';
 import 'commentaire.dart';
 import 'restaurantInfo.dart';
 import 'restaurantHeader.dart';
+import 'ViewAllPicture.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
   late String? idRestaurant;
@@ -95,15 +96,15 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
             RestaurantHeader(restaurant: restaurant!),
             const SizedBox(height: 16.0),
-            
+              
 
-            // Informations du restaurant dans une carte
-            Restaurantinfo(restaurant: restaurant!),
-            const SizedBox(height: 16.0),
+              // Informations du restaurant dans une carte
+              Restaurantinfo(restaurant: restaurant!),
+              const SizedBox(height: 16.0),
 
 
-            // Séparateur pour commentaires
-            const Divider(thickness: 1, color: Colors.grey),
+              // Séparateur pour commentaires
+              const Divider(thickness: 1, color: Colors.grey),
             const SizedBox(height: 16.0),
 
 
@@ -120,6 +121,21 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                       'Commentaires:',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                    IconButton(
+                      icon: const Icon(Icons.collections),
+                      onPressed: () {
+                        print("creer un commentaire");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                              GaleriePhotos(restaurantId: restaurant?.osmid ?? ""),
+                          ),
+                      );
+                    }),
                     IconButton(
                       icon: const Icon(Icons.add_comment_outlined),
                       onPressed: () {
@@ -142,6 +158,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         }
                         );
                       })
+                    ]),
                   ],
                 ),
                 const SizedBox(height: 8.0),
