@@ -77,37 +77,19 @@ class _AccueilState extends State<Accueil> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Section des restaurants filtrés
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                "Tous les Restaurants",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              itemCount: limiteurList(),
-              itemBuilder: (context, index) {
-                final restaurant = _filteredRestaurants[index];
-                return ListElem(
+          return ListView.builder(
+            padding: const EdgeInsets.all(10.0),
+            itemCount: _filteredRestaurants.length,
+            itemBuilder: (context, index) {
+              final restaurant = _filteredRestaurants[index];
+              return GestureDetector(
+                onTap: () {
+                  context.go(context.namedLocation('detail', pathParameters: {'id' : restaurant.osmid.replaceAll("/", "_")}));
+                },
+                child: ListElem(
+                  restaurant: restaurant,
                   image: restaurant.imageHorizontal,
-                  nom: restaurant.nom,
-                  noteMoy: restaurant.noteMoyen,
-                  cuisine: restaurant.cuisines.join(", "),
-                  codeCommune: restaurant.codeCommune,
-                  nomCommune: restaurant.nomCommune,
-                );
-              },
-            ),
-            if (_recommandations.isNotEmpty) ...[
-              const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  "Recommendations",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  estFavoris: false,
                 ),
               ),
               ListView.builder(

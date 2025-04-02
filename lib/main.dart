@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
-import 'UI/restaurantDetaiL.dart';
-import 'UI/Accueil.dart';
+// import 'UI/restaurantDetaiL.dart';
+// import 'UI/Accueil.dart';
 
 import 'UI/mytheme.dart';
 import 'router/router.dart';
 import 'viewModels/settingViewModel.dart';
-
+import 'modele/utilisateur.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());

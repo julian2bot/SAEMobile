@@ -1,64 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:second_app_td2/modele/restaurant.dart';
+import '../modele/utilisateur.dart';
 
-class ListElem extends StatelessWidget {
-  const ListElem({
-    super.key,
-    required this.image,
-    required this.nom,
-    required this.noteMoy,
-    required this.cuisine,
-    required this.codeCommune,
-    required this.nomCommune,
-  });
+class ListElem extends StatefulWidget{
+  late User user;
+  Restaurant restaurant;
+  String image;
+  bool estFavoris;
+  ListElem({super.key, required this.restaurant, required this.image, this.estFavoris = false});
 
-  final String image;
-  final String nom;
-  final int noteMoy;
-  final String cuisine;
-  final String codeCommune;
-  final String nomCommune;
+  @override
+  _ListElemState createState() => _ListElemState();
+}
+
+class _ListElemState extends State<ListElem> {
+  @override
+  void initState() {
+    super.initState();
+    _loadState();
+  }
+
+  Future<void> _loadState() async{
+    User user = (await User.getUser())!;
+    bool fav = await user.estFavoris(widget.restaurant.osmid);
+    setState(() {
+      widget.estFavoris = fav;
+      widget.user = user;
+    });;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Card(
+        elevation: 5,
         child: SizedBox(
           height: 100,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: 1.0,
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Image.asset(
-                    'assets/images/Boeuf.png',
-                    height: 100,
-                    width: 100,
-                    fit: BoxFit.cover,
+          child: Padding(
+              padding: EdgeInsets.all(10),
+              child:Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+
+                  AspectRatio(
+                    aspectRatio: 2.0,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.image,
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/images/Boeuf.png',
+                        height: 100,
+                        width: 200,
+                        fit: BoxFit.cover,
+                      ),
+                      height: 100,
+                      width: 200,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  height: 100,
-                  width: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
-                  child: _ArticleDescription(
-                    nom: nom,
-                    noteMoy: noteMoy,
-                    cuisine: cuisine,
-                    codeCommune: codeCommune,
-                    nomCommune: nomCommune,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
+                      child: _ArticleDescription(
+                        nom: widget.restaurant.nom,
+                        cuisine: "",
+                        codeCommune: widget.restaurant.codeCommune,
+                        nomCommune: widget.restaurant.nomCommune,
+                      ),
+                    ),
                   ),
-                ),
+                  ElevatedButton(onPressed: ()async{
+                    try{
+                      bool estFavoris = await widget.user.ajoutRetireFavoris(widget.restaurant.osmid);
+                      setState(() {
+                        widget.estFavoris = estFavoris;
+                      });
+                    }catch(e){
+                      print(e);
+                    }
+                  }, child: Icon(widget.estFavoris ? Icons.favorite : Icons.favorite_border, color: Colors.black,))
+                ],
               ),
-            ],
-          ),
+          )
+
         ),
       )
     );
@@ -68,14 +94,12 @@ class ListElem extends StatelessWidget {
 class _ArticleDescription extends StatelessWidget {
   const _ArticleDescription({
     required this.nom,
-    required this.noteMoy,
     required this.cuisine,
     required this.codeCommune,
     required this.nomCommune,
   });
 
   final String nom;
-  final int noteMoy;
   final String cuisine;
   final String codeCommune;
   final String nomCommune;
@@ -97,10 +121,10 @@ class _ArticleDescription extends StatelessWidget {
             cuisine,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12.0, color: Colors.black54),
+            style: const TextStyle(fontSize: 12.0),
           ),
         ),
-        Text(codeCommune, style: const TextStyle(fontSize: 12.0, color: Colors.black87))
+        Text(codeCommune, style: const TextStyle(fontSize: 12.0))
       ],
     );
   }

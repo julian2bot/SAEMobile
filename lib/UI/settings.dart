@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import '../viewModels/settingViewModel.dart';
-import './mytheme.dart';
-import 'package:go_router/go_router.dart';
-import '../modele/utilisateur.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
+
+import '../viewModels/settingViewModel.dart';
+import './mytheme.dart';
+import '../modele/utilisateur.dart';
 import '../API/api_bd.dart';
 import '../UI/popUp.dart';
 
@@ -54,7 +55,7 @@ class _EcranSettingsState extends State<EcranSettings> {
               SettingsTile.navigation(
                 onPressed: (context) {
                   User.clearUser();
-                  GoRouter.of(context).go(context.namedLocation('login'));
+                  GoRouter.of(context).go(context.namedLocation('homepage'));
                 },
                 title: const Text('Déconexion'),
                 leading: const Icon(Icons.logout),
