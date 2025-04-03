@@ -3,22 +3,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:second_app_td2/modele/restaurant.dart';
 import '../modele/utilisateur.dart';
 
-class ListElem extends StatefulWidget {
+class RecoElem extends StatefulWidget {
   late User user;
   Restaurant restaurant;
   String image;
   bool estFavoris;
-  ListElem(
+  RecoElem(
       {super.key,
       required this.restaurant,
       required this.image,
       this.estFavoris = false});
 
   @override
-  _ListElemState createState() => _ListElemState();
+  _RecoElem createState() => _RecoElem();
 }
 
-class _ListElemState extends State<ListElem> {
+class _RecoElem extends State<RecoElem> {
   @override
   void initState() {
     super.initState();
@@ -32,23 +32,25 @@ class _ListElemState extends State<ListElem> {
       widget.estFavoris = fav;
       widget.user = user;
     });
-    ;
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Card(
-          elevation: 5,
-          child: SizedBox(
-              height: 100,
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    AspectRatio(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Card(
+        elevation: 5,
+        margin: const EdgeInsets.all(10.0),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: AspectRatio(
                       aspectRatio: 2.0,
                       child: CachedNetworkImage(
                         imageUrl: widget.image,
@@ -56,27 +58,20 @@ class _ListElemState extends State<ListElem> {
                             const Center(child: CircularProgressIndicator()),
                         errorWidget: (context, url, error) => Image.asset(
                           'assets/images/Boeuf.png',
-                          height: 100,
-                          width: 200,
+                          height: 150,
+                          width: double.infinity,
                           fit: BoxFit.cover,
                         ),
-                        height: 100,
-                        width: 200,
+                        height: 150,
+                        width: double.infinity,
                         fit: BoxFit.cover,
                       ),
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
-                        child: _ArticleDescription(
-                          nom: widget.restaurant.nom,
-                          cuisine: "",
-                          codeCommune: widget.restaurant.codeCommune,
-                          nomCommune: widget.restaurant.nomCommune,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
+                  ),
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(10),
@@ -100,10 +95,23 @@ class _ListElemState extends State<ListElem> {
                         color: Colors.red,
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: _ArticleDescription(
+                  nom: widget.restaurant.nom,
+                  cuisine: "",
+                  codeCommune: widget.restaurant.codeCommune,
+                  nomCommune: widget.restaurant.nomCommune,
                 ),
-              )),
-        ));
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -132,13 +140,11 @@ class _ArticleDescription extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const Padding(padding: EdgeInsets.only(bottom: 2.0)),
-        Expanded(
-          child: Text(
-            cuisine,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12.0),
-          ),
+        Text(
+          cuisine,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 12.0),
         ),
         Text(codeCommune, style: const TextStyle(fontSize: 12.0))
       ],
