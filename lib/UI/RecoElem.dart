@@ -1,47 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:second_app_td2/modele/restaurant.dart';
 
 class RecoElem extends StatelessWidget {
-  const RecoElem({
-    super.key,
-    required this.image,
-    required this.nom,
-    required this.noteMoy,
-    required this.cuisine,
-    required this.codeCommune,
-    required this.nomCommune,
-  });
-
+  final Restaurant restaurant;
   final String image;
-  final String nom;
-  final int noteMoy;
-  final String cuisine;
-  final String codeCommune;
-  final String nomCommune;
+  final bool estFavoris;
+
+  const RecoElem({super.key, required this.restaurant, required this.image, this.estFavoris = false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Card(
-          child: SizedBox(
-            height: 150,
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Card(
+        elevation: 5,
+        child: SizedBox(
+          height: 150,
+          child: Padding(
+            padding: EdgeInsets.all(10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 AspectRatio(
-                  aspectRatio: 1.0,
+                  aspectRatio: 2.0,
                   child: CachedNetworkImage(
                     imageUrl: image,
                     placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                     errorWidget: (context, url, error) => Image.asset(
                       'assets/images/Boeuf.png',
-                      height: 100,
-                      width: 100,
+                      height: 150,
+                      width: 250,
                       fit: BoxFit.cover,
                     ),
-                    height: 100,
-                    width: 100,
+                    height: 150,
+                    width: 250,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -49,18 +42,22 @@ class RecoElem extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
                     child: _ArticleDescription(
-                      nom: nom,
-                      noteMoy: noteMoy,
-                      cuisine: cuisine,
-                      codeCommune: codeCommune,
-                      nomCommune: nomCommune,
+                      nom: restaurant.nom,
+                      cuisine: "",
+                      codeCommune: restaurant.codeCommune,
+                      nomCommune: restaurant.nomCommune,
                     ),
                   ),
                 ),
+                Icon(
+                  estFavoris ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.black,
+                )
               ],
             ),
           ),
-        )
+        ),
+      ),
     );
   }
 }
@@ -68,14 +65,12 @@ class RecoElem extends StatelessWidget {
 class _ArticleDescription extends StatelessWidget {
   const _ArticleDescription({
     required this.nom,
-    required this.noteMoy,
     required this.cuisine,
     required this.codeCommune,
     required this.nomCommune,
   });
 
   final String nom;
-  final int noteMoy;
   final String cuisine;
   final String codeCommune;
   final String nomCommune;
@@ -97,10 +92,10 @@ class _ArticleDescription extends StatelessWidget {
             cuisine,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 20.0, color: Colors.black54),
+            style: const TextStyle(fontSize: 12.0),
           ),
         ),
-        Text(codeCommune, style: const TextStyle(fontSize: 20.0, color: Colors.black87))
+        Text(codeCommune, style: const TextStyle(fontSize: 12.0))
       ],
     );
   }
