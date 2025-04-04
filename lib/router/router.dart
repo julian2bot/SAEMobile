@@ -91,22 +91,26 @@ final router = GoRouter(
         },
         routes: <RouteBase>[
           GoRoute(
-            path: '/',
-            name: "home",
-            builder: (context, state) => Accueil(),
-            routes: [
-              GoRoute(
-                path: 'detail/:id',
-                name: "detail",
-                builder: (context, state) =>
-                    RestaurantDetailPage(idRestaurant: state.pathParameters['id']),
-              )
-            ]
-          ),
+              path: '/',
+              name: "home",
+              builder: (context, state) => Accueil(),
+              routes: [
+                GoRoute(
+                  path: 'detail/:id',
+                  name: "detail",
+                  builder: (context, state) => RestaurantDetailPage(
+                      idRestaurant: state.pathParameters['id']),
+                )
+              ]),
           GoRoute(
             path: '/favorites',
             name: "favorites",
             // builder: (context, state) => CuisinesFavoris(),
+            builder: (context, state) => Favoris(),
+          ),
+          GoRoute(
+            path: '/cuisinefavorites',
+            name: "cuisinefavorites",
             builder: (context, state) => Favoris(),
           ),
           GoRoute(
