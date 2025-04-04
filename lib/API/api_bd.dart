@@ -1019,8 +1019,8 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('restaurant')
-        .update({'horizontal': imageH, 'vertical': imageV}).eq('osmid', osmid);
-    return response.error == null;
+        .update({'horizontal': imageH, 'vertical': imageV}).eq('osmid', osmid).select();
+    return response.isNotEmpty;
   }
 
   // Modifie un commentaire existant
@@ -1035,8 +1035,53 @@ class BdAPI {
         .from('avis')
         .update({'commentaire': commentaire, 'note': etoiles})
         .eq('osmid', osmid)
-        .eq('username', username);
-    return response.error == null;
+        .eq('username', username).select();
+    return response.isNotEmpty;
+  }
+
+  static Future<bool> updateCommentairePhoto(String username, String osmID,
+      String commentaire, int note, File? image) async {
+    // ajouter le comm basique
+    bool addcomment =
+    await BdAPI.updateCommentaire(osmID, username, commentaire, note);
+    // verif comm basique
+    if (!addcomment) {
+      return false;
+    }
+    // await initBD();
+
+    List<String> photos=  await getPhotosCommentaire(osmID, username);
+    if(photos.isNotEmpty){
+      await updatePhoto(osmID, username, image!);
+    }
+    else{
+      await ajoutePhotoCommentaire(osmID, username, image!);
+    }
+
+    return true;
+  }
+
+  static Future<bool> updatePhoto(osmID, username, image) async{
+      await initBD();
+
+      final supabase = Supabase.instance.client;
+      final response = await supabase
+          .from('photo_avis')
+          .select('photoid')
+          .eq('osmid', osmID)
+          .eq('username', username).maybeSingle();
+      if(response == null){
+        return false;
+      }
+
+      String photoID = response["photoid"];
+      print(photoID);
+      final String path = await supabase.storage.from('imagecommentaire').update(
+        photoID,
+        image,
+        fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+      );
+      return true;
   }
 
   // User Management
