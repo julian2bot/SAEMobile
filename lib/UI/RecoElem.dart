@@ -69,8 +69,8 @@ class _RecoElem extends State<RecoElem> {
                     ),
                   ),
                   Positioned(
-                    right: 10,
-                    top: 10,
+                    right: 0,
+                    top: 0,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
