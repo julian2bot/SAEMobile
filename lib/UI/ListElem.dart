@@ -32,12 +32,12 @@ class _ListElemState extends State<ListElem> {
       widget.estFavoris = fav;
       widget.user = user;
     });
-    ;
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
+
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Card(
           elevation: 5,

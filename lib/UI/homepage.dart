@@ -7,18 +7,18 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bienvenue'),
+        title: const Text('Bienvenue'),
         centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "IUTable O'",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
               },
               child: Text('Connexion'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -36,7 +36,7 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => SigninPage()),
                 );
               },
-              child: Text('Inscription'),
+              child: const Text('Inscription'),
             ),
           ],
         ),
