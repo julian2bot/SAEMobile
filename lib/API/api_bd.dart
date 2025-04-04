@@ -202,7 +202,6 @@ class BdAPI {
       restaurantData['cuisines'] = await getCuisinePropose(osmID);
       restaurantData['nomcommune'] =
           (await getCommune(restaurantData["codecommune"]))["nomcommune"];
-      print("\n FINAL DATA" + restaurantData.toString());
       return Restaurant.fromJson(restaurantData);
     }
     return null;
@@ -301,7 +300,7 @@ class BdAPI {
     final data = await supabase
         .from('restaurant')
         .select()
-        .or(types.map((type) => "type.ilike.%$type%").join(','));
+        .inFilter("type", types);
 
     for (var resto in data) {
       lesRestos.add(Restaurant.fromJson(resto));
@@ -350,14 +349,17 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final data = await supabase
         .from('propose')
-        .select('osmid, count(osmid) as nb')
-        .or(cuisines.map((cuisine) => "nomcuisine.ilike.%$cuisine%").join(','))
-        // .groupBy('osmid')
-        .order('nb', ascending: false);
+        .select('osmid, cuisine!inner(*)')
+        .inFilter('cuisine.nomcuisine', cuisines);
     List<Restaurant> restos = [];
     for (var rest in data) {
-      Restaurant? resto = await getRestaurantByID(rest['osmid']);
-      if (resto != null) restos.add(resto);
+      if(rest["cuisine"] != null){
+        Restaurant? resto = await getRestaurantByID(rest['osmid']);
+        if (resto != null){
+          restos.add(resto);
+        }
+      }
+
     }
     return restos;
   }
@@ -578,93 +580,95 @@ class BdAPI {
 
   // Récupère les recommandations pour un utilisateur
   static Future<List<Restaurant>> getMesRecommandations(String username,
-      {int max = 10}) async {
-    // await initBD();
-    // final favoris = await getLesFavoris(username);
-    // final avis = await getMesAvis(username);
-    // final supabase = Supabase.instance.client;
-    // final meilleursData = await supabase
-    //     .from('avis')
-    //     .select('*')
-    //     .eq('username', username)
-    //     .gte('note', 3);
-    // final meilleurs = meilleursData;
-    // if (meilleurs.isEmpty) {
-    //   return [];
-    // }
-    // Map<String, int> lesCuisines = {};
-    // Map<String, int> lesTypes = {};
-    // for (var favResto in favoris) {
-    //   lesTypes[favResto.type] = (lesTypes[favResto.type] ?? 0) + 1;
-    //   final cuisines = await getCuisinePropose(favResto.osmid);
-    //   for (var cuisine in cuisines) {
-    //     lesCuisines[cuisine] = (lesCuisines[cuisine] ?? 0) + 1;
-    //   }
-    // }
-    // // for (var favResto in meilleurs) {
-    // //   print(favResto);
-    // //   print("favResto");
-    // //   lesTypes[favResto['type']] = (lesTypes[favResto['type']] ?? 0) + 1;
-    // //   final cuisines = await getCuisinePropose(favResto['osmid']);
-    // //   for (var cuisine in cuisines) {
-    // //     lesCuisines[cuisine] = (lesCuisines[cuisine] ?? 0) + 1;
-    // //   }
-    // // }
-    // final sortedCuisines = Map.fromEntries(lesCuisines.entries.toList()
-    //   ..sort((a, b) => b.value.compareTo(a.value)));
-    // final sortedTypes = Map.fromEntries(
-    //     lesTypes.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
-    // final topCuisines = sortedCuisines.keys.take(2).toList();
-    // final topTypes = sortedTypes.keys.take(2).toList();
-    // final lesCuisinesRestos = await getRestoByCuisine(topCuisines);
-    // final lesTypesRestos = await getRestoByType(topTypes);
-    // List<Restaurant> lesRecos = [];
-    // int indexCuisines = 0;
-    // int indexTypes = 0;
-    // while (indexCuisines < max &&
-    //     indexCuisines < lesCuisinesRestos.length &&
-    //     lesRecos.length < max) {
-    //   final resto = lesCuisinesRestos[indexCuisines];
-    //   if (!favoris.contains(resto) &&
-    //       !lesRecos.contains(resto) &&
-    //       !avisContinentResto(avis, resto.osmid)) {
-    //     lesRecos.add(resto);
-    //   }
-    //   indexCuisines++;
-    // }
-    // while (indexTypes < max &&
-    //     indexTypes < lesTypesRestos.length &&
-    //     lesRecos.length < max) {
-    //   final resto = lesTypesRestos[indexTypes];
-    //   if (!favoris.contains(resto) &&
-    //       !lesRecos.contains(resto) &&
-    //       !avisContinentResto(avis, resto.osmid)) {
-    //     lesRecos.add(resto);
-    //   }
-    //   indexTypes++;
-    // }
-    // if (lesRecos.length < max) {
-    //   final lesRestosLambda = await getResto();
-    //   int indexLambda = 0;
-    //   while (indexLambda < max &&
-    //       indexLambda < lesRestosLambda.length &&
-    //       lesRecos.length < max) {
-    //     final resto = lesRestosLambda[indexLambda];
-    //     if (!favoris.contains(resto) &&
-    //         !lesRecos.contains(resto) &&
-    //         !avisContinentResto(avis, resto.osmid)) {
-    //       lesRecos.add(resto);
-    //     }
-    //     indexLambda++;
-    //   }
-    // }
-    // for (var reco in lesRecos) {
-    //   if (reco.cuisines == []) {
-    //     reco.cuisines = await getCuisinePropose(reco.osmid);
-    //   }
-    // }
-    // return lesRecos;
-    return getResto();
+      {int max = 10, int favWeigth = 2}) async {
+    await initBD();
+    final favoris = await getLesFavoris(username);
+    print("\n AVIS \n");
+    final avis = await getMesAvis(username);
+    print("\n Après AVIS \n");
+    final supabase = Supabase.instance.client;
+    final meilleursData = await supabase
+        .from('avis')
+        .select('*')
+        .eq('username', username)
+        .gte('note', 3);
+    final meilleurs = meilleursData;
+    if (meilleurs.isEmpty) {
+      return [];
+    }
+    print("\n ICI \n");
+    Map<String, int> lesCuisines = {};
+    Map<String, int> lesTypes = {};
+    for (var favResto in favoris) {
+      lesTypes[favResto.type] = (lesTypes[favResto.type] ?? 0) + 1;
+      final cuisines = await getCuisinePropose(favResto.osmid);
+      for (var cuisine in cuisines) {
+        lesCuisines[cuisine] = (lesCuisines[cuisine] ?? 0) + 1;
+      }
+    }
+    print(lesCuisines);
+
+    for (var favCuisines in await getCuisinesPref(username)){
+      lesCuisines[favCuisines] = (lesCuisines[favCuisines] ?? 0) + favWeigth;
+    }
+
+    print(lesCuisines);
+
+    final sortedCuisines = Map.fromEntries(lesCuisines.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value)));
+    final sortedTypes = Map.fromEntries(
+        lesTypes.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
+    final topCuisines = sortedCuisines.keys.take(2).toList();
+    final topTypes = sortedTypes.keys.take(2).toList();
+    final lesCuisinesRestos = await getRestoByCuisine(topCuisines);
+    final lesTypesRestos = await getRestoByType(topTypes);
+    List<Restaurant> lesRecos = [];
+    int indexCuisines = 0;
+    int indexTypes = 0;
+    while (indexCuisines < max &&
+        indexCuisines < lesCuisinesRestos.length &&
+        lesRecos.length < max) {
+      final resto = lesCuisinesRestos[indexCuisines];
+      if (!favoris.contains(resto) &&
+          !lesRecos.contains(resto) &&
+          !avisContinentResto(avis, resto.osmid)) {
+        lesRecos.add(resto);
+      }
+      indexCuisines++;
+    }
+    while (indexTypes < max &&
+        indexTypes < lesTypesRestos.length &&
+        lesRecos.length < max) {
+      final resto = lesTypesRestos[indexTypes];
+      if (!favoris.contains(resto) &&
+          !lesRecos.contains(resto) &&
+          !avisContinentResto(avis, resto.osmid)) {
+        lesRecos.add(resto);
+      }
+      indexTypes++;
+    }
+    if (lesRecos.length < max) {
+      final lesRestosLambda = await getResto();
+      int indexLambda = 0;
+      while (indexLambda < max &&
+          indexLambda < lesRestosLambda.length &&
+          lesRecos.length < max) {
+        final resto = lesRestosLambda[indexLambda];
+        if (!favoris.contains(resto) &&
+            !lesRecos.contains(resto) &&
+            !avisContinentResto(avis, resto.osmid)) {
+          lesRecos.add(resto);
+        }
+        indexLambda++;
+      }
+    }
+    for (var reco in lesRecos) {
+      if (reco.cuisines == []) {
+        reco.cuisines = await getCuisinePropose(reco.osmid);
+      }
+    }
+    return lesRecos;
+    // return getResto();
   }
 
   // Recherche des restaurants par nom ou cuisine
