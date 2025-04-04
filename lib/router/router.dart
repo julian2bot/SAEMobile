@@ -100,17 +100,17 @@ final router = GoRouter(
                   name: "detail",
                   builder: (context, state) => RestaurantDetailPage(
                       idRestaurant: state.pathParameters['id']),
+                ),
+                GoRoute(
+                  path: 'cuisinefavorites',
+                  name: "cuisinefavorites",
+                  builder: (context, state) => CuisinesFavoris(),
                 )
               ]),
           GoRoute(
             path: '/favorites',
             name: "favorites",
             // builder: (context, state) => CuisinesFavoris(),
-            builder: (context, state) => Favoris(),
-          ),
-          GoRoute(
-            path: '/cuisinefavorites',
-            name: "cuisinefavorites",
             builder: (context, state) => Favoris(),
           ),
           GoRoute(
