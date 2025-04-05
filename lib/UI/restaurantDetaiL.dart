@@ -8,6 +8,7 @@ import '../API/geolocator.dart';
 
 import '../modele/commentaire.dart';
 import '../modele/restaurant.dart';
+import '../modele/utilisateur.dart';
 
 import 'ajout_commentaire.dart';
 import 'commentaire.dart';
@@ -32,6 +33,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   Restaurant? restaurant;
   bool isLoading = true;
   String? errorMessage;
+  bool isAdmin = false;
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   Future<void> _loadRestaurant() async {
     try {
       if(widget.idRestaurant != null){
+        final user = await User.getUser();
         final resto = await BdAPI.getRestaurantByID(widget.idRestaurant!);
         if (resto == null) {
           context.go(context.namedLocation('404message', pathParameters: {'errorMessage' : "Restaurant introuvable"}));
@@ -51,6 +54,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         setState(() {
           restaurant = resto;
           isLoading = false;
+          if(user != null)
+          isAdmin = user!.isAdmin;
+          print(user!.isAdmin);
         });
       }
       else{
@@ -186,10 +192,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             
             // debut boucle for
             for (var commentaire in restaurant?.lesCommentaires ?? [])
-              CommentaireDetail(commentaire: commentaire),
+              CommentaireDetail(commentaire: commentaire, isAdmin: isAdmin,),
               // fin boucle for
-
-
           ],
         ),
       ),
