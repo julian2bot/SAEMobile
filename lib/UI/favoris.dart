@@ -18,11 +18,20 @@ class _FavorisState extends State<Favoris> {
   List<Restaurant> _restaurants = [];
   bool isLoading = true;
   String? errorMessage;
-
+  late User _user;
   @override
   void initState() {
     super.initState();
     _loadRestaurant();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    var user = await User.getUser();
+
+    setState(() {
+      _user = user!;
+    });
   }
 
   Future<void> _loadRestaurant() async {
@@ -63,7 +72,8 @@ class _FavorisState extends State<Favoris> {
       appBar: AppBar(
         title: const Text("Vos Favoris"),
       ),
-      body: FutureBuilder<List<Restaurant>>( // Utilisation de FutureBuilder
+      body: FutureBuilder<List<Restaurant>>(
+        // Utilisation de FutureBuilder
         future: restaurantsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -72,7 +82,7 @@ class _FavorisState extends State<Favoris> {
             return const Center(child: Text("Erreur : \${snapshot.error}"));
           }
 
-          if(_restaurants.isEmpty){
+          if (_restaurants.isEmpty) {
             return const Center(child: Text("Vous n'avez aucun favoris"));
           }
 
@@ -83,12 +93,16 @@ class _FavorisState extends State<Favoris> {
               final restaurant = _restaurants[index];
               return GestureDetector(
                 onTap: () {
-                  context.go(context.namedLocation('detail', pathParameters: {'id' : restaurant.osmid.replaceAll("/", "_")}));
+                  context.go(context.namedLocation('detail', pathParameters: {
+                    'id': restaurant.osmid.replaceAll("/", "_")
+                  }));
                 },
                 child: ListElem(
-                  restaurant: restaurant,
-                  image: restaurant.imageHorizontal,
-                  estFavoris: true,
+                    restaurant: restaurant,
+                    image: restaurant.imageHorizontal,
+                    estFavoris: true,
+                    user: _user,
+                    lesfavs: const {}, // juste pour initaliser car obligé pour l'autre page....
                 ),
               );
             },

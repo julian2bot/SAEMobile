@@ -4,15 +4,20 @@ import 'package:second_app_td2/modele/restaurant.dart';
 import '../modele/utilisateur.dart';
 
 class RecoElem extends StatefulWidget {
-  late User user;
+  final User user;
   Restaurant restaurant;
   String image;
   bool estFavoris;
+  Map<String, bool> lesfavs = {};
+
   RecoElem(
       {super.key,
       required this.restaurant,
       required this.image,
-      this.estFavoris = false});
+      required this.user,
+      required this.lesfavs,
+
+      required this.estFavoris});
 
   @override
   _RecoElem createState() => _RecoElem();
@@ -22,17 +27,17 @@ class _RecoElem extends State<RecoElem> {
   @override
   void initState() {
     super.initState();
-    _loadState();
+    // _loadState();
   }
 
-  Future<void> _loadState() async {
-    User user = (await User.getUser())!;
-    bool fav = await user.estFavoris(widget.restaurant.osmid);
-    setState(() {
-      widget.estFavoris = fav;
-      widget.user = user;
-    });
-  }
+  // Future<void> _loadState() async {
+  //   // User user = (await User.getUser())!;
+  //   // bool fav = await user.estFavoris(widget.restaurant.osmid);
+  //   setState(() {
+  //     // widget.estFavoris = fav;
+  //     // widget.user = user;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +86,8 @@ class _RecoElem extends State<RecoElem> {
                         try {
                           bool estFavoris = await widget.user
                               .ajoutRetireFavoris(widget.restaurant.osmid);
+                              widget.lesfavs[widget.restaurant.osmid] = !(widget.lesfavs[widget.restaurant.osmid]??false);
+
                           setState(() {
                             widget.estFavoris = estFavoris;
                           });

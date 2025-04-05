@@ -4,14 +4,18 @@ import 'package:second_app_td2/modele/restaurant.dart';
 import '../modele/utilisateur.dart';
 
 class ListElem extends StatefulWidget {
-  late User user;
+  final User user;
   Restaurant restaurant;
   String image;
   bool estFavoris;
+  Map<String, bool> lesfavs = {};
+
   ListElem(
       {super.key,
       required this.restaurant,
       required this.image,
+      required this.user,
+      required this.lesfavs,
       this.estFavoris = false});
 
   @override
@@ -26,11 +30,10 @@ class _ListElemState extends State<ListElem> {
   }
 
   Future<void> _loadState() async {
-    User user = (await User.getUser())!;
-    bool fav = await user.estFavoris(widget.restaurant.osmid);
+      bool fav = await widget.user.estFavoris(widget.restaurant.osmid);
+
     setState(() {
       widget.estFavoris = fav;
-      widget.user = user;
     });
   }
 
@@ -86,6 +89,7 @@ class _ListElemState extends State<ListElem> {
                         try {
                           bool estFavoris = await widget.user
                               .ajoutRetireFavoris(widget.restaurant.osmid);
+                              widget.lesfavs[widget.restaurant.osmid] = !(widget.lesfavs[widget.restaurant.osmid]??false);
                           setState(() {
                             widget.estFavoris = estFavoris;
                           });
