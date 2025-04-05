@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:second_app_td2/UI/homepage.dart';
+
+import '../UI/homepage.dart';
 import '../UI/restaurantDetaiL.dart';
 import '../modele/utilisateur.dart';
 import '../UI/404.dart';
@@ -11,22 +12,6 @@ import '../UI/favoris.dart';
 import '../UI/inscription.dart';
 import '../UI/connexion.dart';
 import '../UI/cuisines_favoris.dart';
-
-class Test extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-      child: ElevatedButton(
-        onPressed: () {
-          User.saveUser(User(userName: "admin", isAdmin: true));
-          context.go(context.namedLocation('home'));
-        },
-        child: const Text("Login as 'admin'"),
-      ),
-    ));
-  }
-}
 
 class ScaffoldWithNavBar extends StatefulWidget {
   final Widget child;
