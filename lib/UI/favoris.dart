@@ -19,6 +19,8 @@ class _FavorisState extends State<Favoris> {
   bool isLoading = true;
   String? errorMessage;
   late User _user;
+  Map<String, bool> favsAllRestoFav = {};
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +44,11 @@ class _FavorisState extends State<Favoris> {
         setState(() {
           _restaurants = restaurants;
           isLoading = false;
+
+          Map<String, bool> favsAllRestoFav = {};
+          for (var resto in restaurants) {
+            favsAllRestoFav[resto.osmid] = true;
+          }
         });
       });
     } catch (e) {
@@ -102,7 +109,7 @@ class _FavorisState extends State<Favoris> {
                     image: restaurant.imageHorizontal,
                     estFavoris: true,
                     user: _user,
-                    lesfavs: const {}, // juste pour initaliser car obligé pour l'autre page....
+                    lesfavs: favsAllRestoFav, // juste pour initaliser car obligé pour l'autre page....
                 ),
               );
             },
