@@ -71,9 +71,9 @@ class User {
     return await BdAPI.getCommentairesRestoUser(osmId, this.userName);
   }
 
-  Future<List<String>> getMesCuisinesPref() async {
-    return await BdAPI.getCuisinesPref(this.userName);
-  }
+  // Future<List<String>> getMesCuisinesPref() async {
+  //   return await BdAPI.getCuisinesPref(this.userName);
+  // }
 
   Future<bool> estFavoris(String osmid) async {
     return await BdAPI.estFavoris(osmid, this.userName);

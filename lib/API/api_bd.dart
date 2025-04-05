@@ -278,7 +278,7 @@ class BdAPI {
         cuisines.add(cuisineData["nomcuisine"]);
       }
     }
-
+    print(cuisines);
     return cuisines;
   }
 
@@ -297,10 +297,8 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final List<Restaurant> lesRestos = [];
 
-    final data = await supabase
-        .from('restaurant')
-        .select()
-        .inFilter("type", types);
+    final data =
+        await supabase.from('restaurant').select().inFilter("type", types);
 
     for (var resto in data) {
       lesRestos.add(Restaurant.fromJson(resto));
@@ -353,13 +351,12 @@ class BdAPI {
         .inFilter('cuisine.nomcuisine', cuisines);
     List<Restaurant> restos = [];
     for (var rest in data) {
-      if(rest["cuisine"] != null){
+      if (rest["cuisine"] != null) {
         Restaurant? resto = await getRestaurantByID(rest['osmid']);
-        if (resto != null){
+        if (resto != null) {
           restos.add(resto);
         }
       }
-
     }
     return restos;
   }
@@ -549,7 +546,8 @@ class BdAPI {
   //   return res;
   // }
 
-  static Future<List<String>> getStringPhotosCommentairesResto(String osmID) async {
+  static Future<List<String>> getStringPhotosCommentairesResto(
+      String osmID) async {
     await initBD();
     final supabase = Supabase.instance.client;
 
@@ -569,14 +567,14 @@ class BdAPI {
 
     return imageUrls;
   }
+
   static Future<List<Image>> getPhotosCommentairesResto(osmid) async {
-      if (osmid != '0') {
-        List<String> urls = await BdAPI.getStringPhotosCommentairesResto(osmid);
+    if (osmid != '0') {
+      List<String> urls = await BdAPI.getStringPhotosCommentairesResto(osmid);
       return urls.map((url) => Image.network(url)).toList();
     }
     return [];
   }
-
 
   // Récupère les recommandations pour un utilisateur
   static Future<List<Restaurant>> getMesRecommandations(String username,
@@ -605,7 +603,7 @@ class BdAPI {
     }
     print(lesCuisines);
 
-    for (var favCuisines in await getCuisinesPref(username)){
+    for (var favCuisines in await getCuisinesPref(username)) {
       lesCuisines[favCuisines] = (lesCuisines[favCuisines] ?? 0) + favWeigth;
     }
 
@@ -1024,7 +1022,9 @@ class BdAPI {
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('restaurant')
-        .update({'horizontal': imageH, 'vertical': imageV}).eq('osmid', osmid).select();
+        .update({'horizontal': imageH, 'vertical': imageV})
+        .eq('osmid', osmid)
+        .select();
     return response.isNotEmpty;
   }
 
@@ -1040,7 +1040,8 @@ class BdAPI {
         .from('avis')
         .update({'commentaire': commentaire, 'note': etoiles})
         .eq('osmid', osmid)
-        .eq('username', username).select();
+        .eq('username', username)
+        .select();
     return response.isNotEmpty;
   }
 
@@ -1048,45 +1049,45 @@ class BdAPI {
       String commentaire, int note, File? image) async {
     // ajouter le comm basique
     bool addcomment =
-    await BdAPI.updateCommentaire(osmID, username, commentaire, note);
+        await BdAPI.updateCommentaire(osmID, username, commentaire, note);
     // verif comm basique
     if (!addcomment) {
       return false;
     }
     // await initBD();
 
-    List<String> photos=  await getPhotosCommentaire(osmID, username);
-    if(photos.isNotEmpty){
+    List<String> photos = await getPhotosCommentaire(osmID, username);
+    if (photos.isNotEmpty) {
       await updatePhoto(osmID, username, image!);
-    }
-    else{
+    } else {
       await ajoutePhotoCommentaire(osmID, username, image!);
     }
 
     return true;
   }
 
-  static Future<bool> updatePhoto(osmID, username, image) async{
-      await initBD();
+  static Future<bool> updatePhoto(osmID, username, image) async {
+    await initBD();
 
-      final supabase = Supabase.instance.client;
-      final response = await supabase
-          .from('photo_avis')
-          .select('photoid')
-          .eq('osmid', osmID)
-          .eq('username', username).maybeSingle();
-      if(response == null){
-        return false;
-      }
+    final supabase = Supabase.instance.client;
+    final response = await supabase
+        .from('photo_avis')
+        .select('photoid')
+        .eq('osmid', osmID)
+        .eq('username', username)
+        .maybeSingle();
+    if (response == null) {
+      return false;
+    }
 
-      String photoID = response["photoid"];
-      print(photoID);
-      final String path = await supabase.storage.from('imagecommentaire').update(
-        photoID,
-        image,
-        fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-      );
-      return true;
+    String photoID = response["photoid"];
+    print(photoID);
+    final String path = await supabase.storage.from('imagecommentaire').update(
+          photoID,
+          image,
+          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+        );
+    return true;
   }
 
   // User Management
