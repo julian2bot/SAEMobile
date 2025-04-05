@@ -34,12 +34,11 @@ class Restaurant {
     this.imageHorizontal = "",
     this.noteMoyen = 0,
     this.lesCommentaires = const [],
-    this.longitude =0,
+    this.longitude = 0,
     this.latitude = 0,
   });
 
   static Restaurant fromJson(Map<String, dynamic> json) {
-    print("\n FROM JSON \n");
     return Restaurant(
       osmid: json["osmid"] ?? "",
       nom: json["nomrestaurant"] ?? "",
@@ -121,10 +120,37 @@ class Restaurant {
     return this.cuisines;
   }
 
-  Future<List<String>> getMesPhotosCommentaire() async {
-    if (this.osmid != '0') {
-      return await BdAPI.getPhotosCommentairesResto(this.osmid);
+  // Future<List<String>> getMesPhotosCommentaire() async {
+  //   if (this.osmid != '0') {
+  //     return await BdAPI.getPhotosCommentairesResto(this.osmid);
+  //   }
+  //   return [];
+  // }
+
+  Future<List<Image>> getMesPhotosCommentaire() async {
+    return await BdAPI.getPhotosCommentairesResto(osmid);
+  }
+
+  Future<Image?> getPhotoCommentaire() async {
+    List<Image> LesImagesComm = await this.getMesPhotosCommentaire();
+
+    if (LesImagesComm.isNotEmpty) {
+      return LesImagesComm[0];
     }
-    return [];
+    return null;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Restaurant && other.osmid == this.osmid;
+  }
+
+  @override
+  int get hashCode => this.osmid.hashCode;
+
+  @override
+  String toString() {
+    return 'Restaurant(osmid: $osmid, nom: $nom)';
   }
 }

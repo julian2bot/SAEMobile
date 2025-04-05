@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyTheme {
+  static Color colDark = Color(0xFF6CB4FF);
+  static Color colLight = Color(0xFFFFB469);
   // 1
   static TextTheme lightTextTheme = TextTheme(
     bodyLarge: GoogleFonts.openSans(

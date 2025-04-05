@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../modele/utilisateur.dart';
 
 class Favoris extends StatefulWidget {
-  Favoris({super.key});
+  const Favoris({super.key});
 
   @override
   _FavorisState createState() => _FavorisState();
@@ -18,11 +18,22 @@ class _FavorisState extends State<Favoris> {
   List<Restaurant> _restaurants = [];
   bool isLoading = true;
   String? errorMessage;
+  late User _user;
+  Map<String, bool> favsAllRestoFav = {};
 
   @override
   void initState() {
     super.initState();
     _loadRestaurant();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    var user = await User.getUser();
+
+    setState(() {
+      _user = user!;
+    });
   }
 
   Future<void> _loadRestaurant() async {
@@ -33,6 +44,11 @@ class _FavorisState extends State<Favoris> {
         setState(() {
           _restaurants = restaurants;
           isLoading = false;
+
+          Map<String, bool> favsAllRestoFav = {};
+          for (var resto in restaurants) {
+            favsAllRestoFav[resto.osmid] = true;
+          }
         });
       });
     } catch (e) {
@@ -47,8 +63,8 @@ class _FavorisState extends State<Favoris> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text("Chargement des favoris")),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text("Chargement des favoris")),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -63,16 +79,17 @@ class _FavorisState extends State<Favoris> {
       appBar: AppBar(
         title: const Text("Vos Favoris"),
       ),
-      body: FutureBuilder<List<Restaurant>>( // Utilisation de FutureBuilder
+      body: FutureBuilder<List<Restaurant>>(
+        // Utilisation de FutureBuilder
         future: restaurantsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erreur : \${snapshot.error}"));
+            return const Center(child: Text("Erreur : \${snapshot.error}"));
           }
 
-          if(_restaurants.isEmpty){
+          if (_restaurants.isEmpty) {
             return const Center(child: Text("Vous n'avez aucun favoris"));
           }
 
@@ -83,12 +100,16 @@ class _FavorisState extends State<Favoris> {
               final restaurant = _restaurants[index];
               return GestureDetector(
                 onTap: () {
-                  context.go(context.namedLocation('detail', pathParameters: {'id' : restaurant.osmid.replaceAll("/", "_")}));
+                  context.go(context.namedLocation('detail', pathParameters: {
+                    'id': restaurant.osmid.replaceAll("/", "_")
+                  }));
                 },
                 child: ListElem(
-                  restaurant: restaurant,
-                  image: restaurant.imageHorizontal,
-                  estFavoris: true,
+                    restaurant: restaurant,
+                    image: restaurant.imageHorizontal,
+                    estFavoris: true,
+                    user: _user,
+                    lesfavs: favsAllRestoFav, // juste pour initaliser car obligé pour l'autre page....
                 ),
               );
             },
