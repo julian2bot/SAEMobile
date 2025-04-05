@@ -583,9 +583,7 @@ class BdAPI {
       {int max = 10, int favWeigth = 2}) async {
     await initBD();
     final favoris = await getLesFavoris(username);
-    print("\n AVIS \n");
     final avis = await getMesAvis(username);
-    print("\n Après AVIS \n");
     final supabase = Supabase.instance.client;
     final meilleursData = await supabase
         .from('avis')
@@ -596,7 +594,6 @@ class BdAPI {
     if (meilleurs.isEmpty) {
       return [];
     }
-    print("\n ICI \n");
     Map<String, int> lesCuisines = {};
     Map<String, int> lesTypes = {};
     for (var favResto in favoris) {
@@ -667,6 +664,7 @@ class BdAPI {
         reco.cuisines = await getCuisinePropose(reco.osmid);
       }
     }
+    print(lesRecos);
     return lesRecos;
     // return getResto();
   }

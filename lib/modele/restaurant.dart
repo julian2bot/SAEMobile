@@ -139,4 +139,18 @@ class Restaurant {
     }
     return null;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Restaurant && other.osmid == this.osmid;
+  }
+
+  @override
+  int get hashCode => this.osmid.hashCode;
+
+  @override
+  String toString() {
+    return 'Restaurant(osmid: $osmid, nom: $nom)';
+  }
 }
