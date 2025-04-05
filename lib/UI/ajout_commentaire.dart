@@ -76,7 +76,10 @@ class _AddCommentState extends State<AddComment> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(comm!=null ? "Modifier votre commentaire" : "Ajouter un commentaire")),
+      appBar: AppBar(
+          title: Text(comm != null
+              ? "Modifier votre commentaire"
+              : "Ajouter un commentaire")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -185,7 +188,9 @@ class _AddCommentState extends State<AddComment> {
 
               // validation
               ElevatedButton(
-                  child: Text((comm != null ? "Modifier le commentaire" : 'Ajouter le commentaire')),
+                  child: Text((comm != null
+                      ? "Modifier le commentaire"
+                      : 'Ajouter le commentaire')),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       // recup les infos
@@ -279,6 +284,20 @@ class _AddCommentState extends State<AddComment> {
                     }
                     ;
                   }),
+              if (comm != null)
+                ElevatedButton(
+                    onPressed: () async {
+                      bool success = await BdAPI.deleteCommentaireUser(comm!.resto, comm!.username);
+                      showPopUp(
+                          context,
+                          success
+                              ? "Commentaire supprimé avec succès !"
+                              : "Erreur lors de la suppression du commentaire.",
+                          success);
+                      Navigator.pop(context, 'Nouveau commentaire');
+
+                    },
+                    child: Text("Supprimer mon commentaire"))
             ],
           ),
         ),
