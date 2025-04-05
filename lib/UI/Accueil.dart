@@ -19,6 +19,8 @@ class _AccueilState extends State<Accueil> {
   List<Restaurant> _filteredRestaurants = [];
   List<Restaurant> _recommandations = [];
   TextEditingController _searchController = TextEditingController();
+  late User _user;
+  Map<String, bool> _favorisListe = {};
 
   @override
   void initState() {
@@ -32,14 +34,22 @@ class _AccueilState extends State<Accueil> {
     List<Restaurant> recommandations =
         await user?.getMesRecommendations() ?? [];
 
+    Map<String, bool> favsAllResto = {};
+    for (var resto in restaurants) {
+      favsAllResto[resto.osmid] = await user!.estFavoris(resto.osmid);
+    }
+    print(recommandations);
     setState(() {
+      _user = user!;
+
       _restaurants = restaurants;
       _filteredRestaurants = restaurants;
       _recommandations = recommandations;
+      _favorisListe = favsAllResto;
     });
   }
 
-  void _filterRestaurants(String query) {
+  void _filterRestaurants(String query) async {
     setState(() {
       _filteredRestaurants = _restaurants
           .where((restaurant) =>
@@ -87,8 +97,11 @@ class _AccueilState extends State<Accueil> {
                     itemCount: _filteredRestaurants.length > 5
                         ? 5
                         : _filteredRestaurants.length,
+
                     itemBuilder: (context, index) {
                       final restaurant = _filteredRestaurants[index];
+                      final estFav = _favorisListe[restaurant.osmid] ?? false;
+
                       return GestureDetector(
                         onTap: () {
                           context.go(context.namedLocation('detail',
@@ -99,7 +112,9 @@ class _AccueilState extends State<Accueil> {
                         child: ListElem(
                           restaurant: restaurant,
                           image: restaurant.imageHorizontal,
-                          estFavoris: false,
+                          estFavoris: estFav,
+                          user: _user,
+                          lesfavs:_favorisListe, // pour pouvoir les edits dans un resto et edit aussi la Map ici (pas la meilleur facon de faire maiiss...)
                         ),
                       );
                     },
@@ -142,6 +157,7 @@ class _AccueilState extends State<Accueil> {
                         : _recommandations.length,
                     itemBuilder: (context, index) {
                       final restaurant = _recommandations[index];
+                      final estFav = _favorisListe[restaurant.osmid] ?? false;
                       return GestureDetector(
                         onTap: () {
                           context.go(context.namedLocation('detail',
@@ -152,7 +168,9 @@ class _AccueilState extends State<Accueil> {
                         child: RecoElem(
                           restaurant: restaurant,
                           image: restaurant.imageHorizontal,
-                          estFavoris: false,
+                          estFavoris: estFav,
+                          user: _user,
+                          lesfavs: _favorisListe,
                         ),
                       );
                     },

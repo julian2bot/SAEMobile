@@ -35,17 +35,17 @@ class User {
     bool? isAdmin = prefs.getBool("isAdmin");
 
     if (userName != null) {
-      return User(userName: userName, isAdmin: isAdmin??false);
+      return User(userName: userName, isAdmin: isAdmin ?? false);
     }
-    return null; 
+    return null;
   }
 
   static Future<String?> getUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString("userName"); 
+    return prefs.getString("userName");
   }
 
-  static Future<bool> isAuthentificated() async{
+  static Future<bool> isAuthentificated() async {
     return await getUser() != null;
   }
 
@@ -55,31 +55,33 @@ class User {
     await prefs.remove("isAdmin");
   }
 
-  Future<List<Restaurant>> getLesFavoris() async{
+  Future<List<Restaurant>> getLesFavoris() async {
     return await BdAPI.getLesFavoris(this.userName);
   }
 
-  Future<List<Restaurant>> getMesRecommendations() async{
+  Future<List<Restaurant>> getMesRecommendations() async {
     return await BdAPI.getMesRecommandations(this.userName);
   }
 
-  Future<List<Commentaire>> getMesAvis() async{
+  Future<List<Commentaire>> getMesAvis() async {
     return await BdAPI.getMesAvis(this.userName);
   }
 
-  Future<Commentaire?> getCommentaireResto(String osmId) async{
+  Future<Commentaire?> getCommentaireResto(String osmId) async {
     return await BdAPI.getCommentairesRestoUser(osmId, this.userName);
   }
 
-  Future<List<String>> getMesCuisinesPref() async{
+  Future<List<String>> getMesCuisinesPref() async {
     return await BdAPI.getCuisinesPref(this.userName);
   }
 
-  Future<bool> estFavoris(String osmid) async{
+  Future<bool> estFavoris(String osmid) async {
     return await BdAPI.estFavoris(osmid, this.userName);
   }
 
-  Future<bool> ajoutRetireFavoris(String osmid) async{
+  Future<bool> ajoutRetireFavoris(String osmid) async {
+    print("this.userName");
+    print(this.userName);
     await BdAPI.ajouteRetirerFavoris(osmid, this.userName);
     return estFavoris(osmid);
   }
